@@ -1,0 +1,26 @@
+{{! analyticsblock.mustache - Analytics header with chart buttons }}
+
+<div class="analytics-header" id="analytics-header">
+    <div class="analytics-buttons">
+        <button class="analytics-btn" data-chart="synopsis_today">Synopsis to date</button>
+        <button class="analytics-btn" data-chart="best_courses">Best Courses</button>
+        <button class="analytics-btn" data-chart="cohort_performance">Cohort Performance</button>
+        <button class="analytics-btn" data-chart="learning_plan">Best Learning Plan</button>
+        <button class="analytics-btn" data-chart="synopsis_30">Synopsis 30 days ago</button>
+        <button class="analytics-btn" data-chart="worst_courses">Worst Courses</button>
+        <button class="analytics-btn" data-chart="study_frequency">Study Frequency</button>
+        <button class="analytics-btn" data-chart="learning_style">Preferred Learning Style</button>
+    </div>
+</div>
+
+<div id="analytics-chart-container">
+    <canvas id="analytics-main-chart"></canvas>
+</div>
+
+<div id="analytics-history">
+    <h6>Previous Charts</h6>
+    <div id="analytics-prev-charts">
+        <canvas class="analytics-prev" id="chart-prev-1"></canvas>
+        <canvas class="analytics-prev" id="chart-prev-2"></canvas>
+    </div>
+</div>

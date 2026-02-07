@@ -1,0 +1,48 @@
+<div class="analytics-dashboard-final">
+    <div class="card p-4 mb-4 bg-primary border-0 shadow" style="border-radius: 20px; margin-top: 10px;">
+        <div class="row no-gutters">
+            {{#buttons}}
+            <div class="col-md-3 p-1">
+                <a href="{{{url}}}" class="btn btn-block py-3 {{#active}}btn-dark shadow{{/active}}{{^active}}btn-light text-primary{{/active}}" 
+                   style="border-radius: 12px; font-weight: bold; font-size: 0.95rem;">
+                    {{label}}
+                </a>
+            </div>
+            {{/buttons}}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="card p-4 mb-4 shadow-sm border-0 bg-white" style="border-left: 8px solid #007bff; border-radius: 12px;">
+                <h5 class="text-primary font-weight-bold"><i class="fa fa-bolt"></i> Live AI Insight</h5>
+                <p class="lead mb-0 text-muted">{{ai_hero_text}}</p>
+            </div>
+
+            <div class="card p-4 bg-white shadow-sm border-0" style="border-radius: 15px; min-height: 550px;">
+                <h2 class="mb-4 font-weight-bold" style="color: #333;">{{chart_title}}</h2>
+                <div class="moodle-chart-area" style="width: 100%;">
+                    {{{chart_html}}}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="sidebar-block mb-4 p-3 bg-white shadow-sm border rounded-lg">
+                <h6 class="text-muted font-weight-bold border-bottom pb-2">Last Chart</h6>
+                <div class="text-primary small font-weight-bold mb-2">{{last_chart_label}}</div>
+                <div style="height: 160px; overflow: hidden;">
+                    {{{last_chart_html}}}
+                </div>
+            </div>
+
+            <div class="sidebar-block p-3 bg-white shadow-sm border rounded-lg">
+                <h6 class="text-muted font-weight-bold border-bottom pb-2">Previous Chart</h6>
+                <div class="text-primary small font-weight-bold mb-2">{{prev_chart_label}}</div>
+                <div style="height: 160px; overflow: hidden;">
+                    {{{prev_chart_html}}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

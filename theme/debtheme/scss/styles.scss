@@ -1,0 +1,31 @@
+// Header & Grid Styling
+.debtheme-header {
+    background: linear-gradient(135deg, #0056b3, #003d80); // Blue Banner
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+
+    .debtheme-header-buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+    }
+}
+
+// Button Style: White BG, Blue Text
+.header-btn {
+    background: #ffffff !important;
+    color: #0056b3 !important;
+    padding: 12px 5px !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    text-align: center;
+    border: 1px solid rgba(0,0,0,0.1) !important;
+    text-decoration: none !important;
+    font-size: 0.85rem !important;
+
+    &:hover {
+        background: #f1f1f1 !important;
+        text-decoration: none !important;
+    }
+}

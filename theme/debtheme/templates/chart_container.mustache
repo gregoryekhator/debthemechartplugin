@@ -1,0 +1,14 @@
+{{!
+    @template theme_debtheme/chart_container
+    Displays a dashboard chart placeholder.
+}}
+
+<!-- ✅ Added a wrapper div with unique ID -->
+<div id="chart-container-wrapper" class="chart-container-wrapper">
+<div class="chart-container mx-auto my-6 p-6 bg-white rounded-xl shadow-md max-w-5xl">
+  <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">
+    {{#str}}chart_title, theme_debtheme{{/str}}
+  </h2>
+  <canvas id="dashboardChart" width="800" height="400"></canvas>
+</div>
+</div>

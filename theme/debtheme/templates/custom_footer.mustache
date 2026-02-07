@@ -1,0 +1,45 @@
+{{!
+@template theme_debtheme/custom_footer
+Canonical Debtheme footer
+}}
+
+<footer id="page-footer" class="debtheme-footer">
+
+    <!-- Social strip -->
+    <section class="debtheme-footer-social">
+        <div class="container-xl d-flex justify-content-between align-items-center py-3">
+            <span>{{#str}}connect_with_us, theme_debtheme{{/str}}</span>
+            {{{ output.social_icons }}}
+        </div>
+    </section>
+
+    <!-- Main footer -->
+    <section class="debtheme-footer-main">
+        <div class="container-xl">
+            <div class="row">
+
+                <div class="col-md-8">
+                    <h3>{{brandorganization_footer}}</h3>
+                    <p>{{{footnote}}}</p>
+                </div>
+
+                <div class="col-md-4">
+                    <h6>{{#str}}contact, theme_debtheme{{/str}}</h6>
+
+                    <p><i class="fa fa-globe"></i> {{brandwebsite_footer}}</p>
+                    <p><i class="fa fa-envelope"></i> {{brandemail_footer}}</p>
+                    <p><i class="fa fa-phone"></i> {{brandphone_footer}}</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Moodle hooks -->
+    {{{ output.standard_footer_html }}}
+
+    <div class="debtheme-footer-bottom text-center py-3">
+        © 2002 – {{year}} {{brandorganization_footer}}
+    </div>
+
+</footer>
