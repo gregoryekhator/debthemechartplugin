@@ -1,0 +1,14 @@
+<div id="chart-container" class="container-fluid">
+    <h3>{{#str}} pluginname, local_chartplugin {{/str}}</h3>
+    <div class="card mb-3">
+        <div class="card-body">
+            <canvas id="studentchart" style="width: 100%; height: 400px;"></canvas>
+        </div>
+    </div>
+</div>
+
+{{#js}}
+require(['local_chartplugin/dashboard'], function(Dashboard) {
+    Dashboard.loadChart('synopsis');
+});
+{{/js}}

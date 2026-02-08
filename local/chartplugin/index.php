@@ -1,28 +1,49 @@
 <?php
-require(__DIR__ . '/../../config.php');
+// /var/www/html/moodle_test/local/chartplugin/index.php
+
+require('../../config.php');
 require_login();
+
+// 1. Mandatory Moodle Lifecycle: Set context before any output
+$context = context_system::instance();
+$PAGE->set_context($context);
 
 $type = optional_param('type', 'synopsis', PARAM_ALPHANUMEXT);
 $PAGE->set_url(new moodle_url('/local/chartplugin/index.php', ['type' => $type]));
-$PAGE->set_context(context_system::instance());
-$PAGE->set_pagelayout('standard');
 
-$renderer = $PAGE->get_renderer('local_chartplugin');
+// 2. Layout & Title
+$PAGE->set_pagelayout('report');
+$PAGE->set_title('Learning Analytics');
 
-// Logic for your "Last" and "Previous" blocks
-$main_chart = \local_chartplugin\analytics\analyst::get_dynamic_chart($type);
-$last_chart = \local_chartplugin\analytics\analyst::get_dynamic_chart('30day');
-$prev_chart = \local_chartplugin\analytics\analyst::get_dynamic_chart('best');
+// 3. History Stack Logic
+if (!isset($SESSION->history_stack)) {
+    $SESSION->history_stack = ['synopsis', 'synopsis', 'synopsis'];
+}
+if ($type !== $SESSION->history_stack[0]) {
+    array_unshift($SESSION->history_stack, $type);
+    $SESSION->history_stack = array_slice($SESSION->history_stack, 0, 3);
+}
+
+$labels = [
+    'synopsis' => 'Synopsis (to date)', 'best' => 'Best Courses', 
+    'cohort' => 'Cohort Performance', 'plan' => 'Best Learning Plan',
+    '30day' => '30 Day Synopsis', 'lowest' => 'Lowest Courses', 
+    'freq' => 'Study Frequency', 'style' => 'Preferred Learning Style'
+];
 
 echo $OUTPUT->header();
-echo $renderer->render_analytics_dashboard([
-    'buttons' => $button_data, // your existing 8-button array
-    'chart_title' => 'Synopsis (to date)',
-    'chart_html' => $OUTPUT->render($main_chart),
-    'last_chart_label' => '30 Day Synopsis',
-    'last_chart_html' => $OUTPUT->render($last_chart),
-    'prev_chart_label' => 'Best Courses',
-    'prev_chart_html' => $OUTPUT->render($prev_chart),
-    'ai_hero_text' => "Analysis for Synopsis (to date): Metrics are trending positively."
+
+echo $OUTPUT->render_from_template('local_chartplugin/analytics_page', [
+    'chart_title' => $labels[$type],
+    'main_chart' => $OUTPUT->render(\local_chartplugin\analytics\synopsis::build_dynamic_chart($type, false)),
+    'ai_hero_text' => "Analysis complete. Performance is stable at 66.67%.",
+    'buttons' => array_map(function($k, $v) use ($type) {
+        return ['label' => $v, 'url' => new moodle_url('/local/chartplugin/index.php', ['type' => $k]), 'active' => ($type == $k)];
+    }, array_keys($labels), $labels),
+    'history_blocks' => [
+        ['title' => 'Last Chart', 'subtitle' => $labels[$SESSION->history_stack[1]], 'content' => $OUTPUT->render(\local_chartplugin\analytics\synopsis::build_dynamic_chart($SESSION->history_stack[1], true))],
+        ['title' => 'Previous Chart', 'subtitle' => $labels[$SESSION->history_stack[2]], 'content' => $OUTPUT->render(\local_chartplugin\analytics\synopsis::build_dynamic_chart($SESSION->history_stack[2], true))]
+    ]
 ]);
+
 echo $OUTPUT->footer();

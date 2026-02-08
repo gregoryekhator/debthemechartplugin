@@ -18,8 +18,8 @@ function local_chartplugin_extend_navigation(global_navigation $nav) {
     }
 
     // Require AMD module.
-    $PAGE->requires->js_call_amd('local_chartplugin/charts', 'init');
+    //$PAGE->requires->js_call_amd('local_chartplugin/charts', 'init');
 
     // Inject container immediately after header.
-    $PAGE->requires->data_for_js('local_chartplugin_render', true);
+    //$PAGE->requires->data_for_js('local_chartplugin_render', true);
 }

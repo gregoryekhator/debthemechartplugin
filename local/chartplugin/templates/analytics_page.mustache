@@ -1,48 +1,44 @@
-<div class="analytics-dashboard-final">
-    <div class="card p-4 mb-4 bg-primary border-0 shadow" style="border-radius: 20px; margin-top: 10px;">
-        <div class="row no-gutters">
-            {{#buttons}}
-            <div class="col-md-3 p-1">
-                <a href="{{{url}}}" class="btn btn-block py-3 {{#active}}btn-dark shadow{{/active}}{{^active}}btn-light text-primary{{/active}}" 
-                   style="border-radius: 12px; font-weight: bold; font-size: 0.95rem;">
-                    {{label}}
-                </a>
+<div class="gold-v2-container">
+    <div class="dashboard-header-container p-4 mb-4">
+        <h2 class="text-white mb-4">Welcome to Debonair Learning</h2>
+        <div class="container-fluid px-0"> 
+            <div class="row no-gutters justify-content-center">
+                {{#buttons}}
+                <div class="button-column">
+                    <a href="{{{url}}}" class="btn btn-block {{#active}}btn-dark{{/active}}{{^active}}btn-light{{/active}} shadow-sm py-2">
+                        {{label}}
+                    </a>
+                </div>
+                {{/buttons}}
             </div>
-            {{/buttons}}
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-9">
-            <div class="card p-4 mb-4 shadow-sm border-0 bg-white" style="border-left: 8px solid #007bff; border-radius: 12px;">
-                <h5 class="text-primary font-weight-bold"><i class="fa fa-bolt"></i> Live AI Insight</h5>
-                <p class="lead mb-0 text-muted">{{ai_hero_text}}</p>
+    <div class="row no-gutters flex-nowrap">
+        <div class="col-md-9 px-2">
+            <div class="ai-insight-box p-4 mb-4 bg-white shadow-sm border-left-primary">
+                <h6 class="text-primary font-weight-bold"><i class="fa fa-magic"></i> AI ANALYSIS & INSIGHTS</h6>
+                <p class="h5 mb-0 mt-2 text-dark">{{ai_hero_text}}</p>
             </div>
 
-            <div class="card p-4 bg-white shadow-sm border-0" style="border-radius: 15px; min-height: 550px;">
-                <h2 class="mb-4 font-weight-bold" style="color: #333;">{{chart_title}}</h2>
-                <div class="moodle-chart-area" style="width: 100%;">
-                    {{{chart_html}}}
+            <div class="main-chart-card p-4 bg-white shadow-sm rounded border">
+                <h2 class="mb-4 text-dark">{{chart_title}}</h2>
+                <div class="chart-container">
+                    {{{main_chart}}}
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-3">
-            <div class="sidebar-block mb-4 p-3 bg-white shadow-sm border rounded-lg">
-                <h6 class="text-muted font-weight-bold border-bottom pb-2">Last Chart</h6>
-                <div class="text-primary small font-weight-bold mb-2">{{last_chart_label}}</div>
-                <div style="height: 160px; overflow: hidden;">
-                    {{{last_chart_html}}}
+        <div class="col-md-3 px-2">
+            {{#history_blocks}}
+            <div class="history-sidebar-card mb-4 p-3 bg-white shadow-sm border rounded">
+                <span class="text-muted small font-weight-bold text-uppercase d-block">{{title}}</span>
+                <span class="text-primary d-block mb-2 font-weight-bold">{{subtitle}}</span>
+                <div class="sidebar-chart-wrapper">
+                    {{{content}}}
                 </div>
             </div>
-
-            <div class="sidebar-block p-3 bg-white shadow-sm border rounded-lg">
-                <h6 class="text-muted font-weight-bold border-bottom pb-2">Previous Chart</h6>
-                <div class="text-primary small font-weight-bold mb-2">{{prev_chart_label}}</div>
-                <div style="height: 160px; overflow: hidden;">
-                    {{{prev_chart_html}}}
-                </div>
-            </div>
+            {{/history_blocks}}
         </div>
     </div>
 </div>

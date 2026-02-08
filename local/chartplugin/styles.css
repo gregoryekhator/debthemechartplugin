@@ -1,72 +1,65 @@
-/* 1. Reset the container to allow wide display */
-.analytics-page-wrapper {
+/* 1. Global Page Structure for Report Layout */
+#page-local-chartplugin-index #region-main {
     width: 100% !important;
-    max-width: 1450px !important;
-    margin: 0 auto !important;
-    padding: 20px;
+    max-width: 100% !important;
+    padding: 0 15px !important;
+    background-color: #f8f9fc !important;
 }
 
-/* 2. FORCE the 75/25 Split */
-.moodle-mapping-grid {
-    display: flex !important;
-    flex-direction: row !important; /* Forces side-by-side */
-    gap: 25px !important;
-    align-items: flex-start !important;
+/* 2. Blue Hero Header */
+.dashboard-header-container {
+    background-color: #007bff !important; /* Solid blue as requested */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
 }
 
-.region-main-content {
-    flex: 0 0 74% !important; /* Main column width */
-    max-width: 74% !important;
-}
-
-.region-sidebar-blocks {
-    flex: 0 0 24% !important; /* Sidebar column width */
+/* 3. Button Grid - 4 per row fixed */
+.button-column {
+    flex: 0 0 24% !important;
     max-width: 24% !important;
+    padding: 6px;
+    box-sizing: border-box;
 }
 
-/* 3. Visual Styling for the "Blocks" to match Image 2 */
-.moodle-styled-block {
-    background: #ffffff;
-    border: 1px solid #eef0f5;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+.button-column .btn {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
 }
 
-.block-header-title {
-    font-size: 0.75rem;
-    color: #0d6efd;
-    font-weight: 800;
-    text-transform: uppercase;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 8px;
-    margin-bottom: 12px;
+.btn-light {
+    background-color: #ffffff !important;
+    color: #007bff !important;
+    border: none !important;
 }
 
-/* 4. AI Hero Styling */
-.ai-hero-card {
-    border-left: 6px solid #0d6efd !important;
-    background: #fdfdfd;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+.btn-dark {
+    background-color: #1c2938 !important;
+    color: #ffffff !important;
+    border: 1.5px solid #ffffff !important;
 }
 
-/* 5. Chart Container */
-.main-chart-well {
-    background: #ffffff;
-    padding: 25px;
-    border-radius: 12px;
-    border: 1px solid #eef0f5;
+/* 4. Main/Sidebar Flex Alignment */
+.gold-v2-container .row.flex-nowrap {
+    display: flex !important;
+    margin: 0 -10px;
 }
 
-/* Responsive: Stack on mobile */
-@media (max-width: 992px) {
-    .moodle-mapping-grid { flex-direction: column !important; }
-    .region-main-content, .region-sidebar-blocks { 
-        flex: 0 0 100% !important; 
-        max-width: 100% !important; 
-    }
+.gold-v2-container .col-md-9 {
+    flex: 0 0 75% !important;
+    max-width: 75% !important;
+}
+
+.gold-v2-container .col-md-3 {
+    flex: 0 0 25% !important;
+    max-width: 25% !important;
+}
+
+/* 5. Insight Box Polish */
+.border-left-primary {
+    border-left: 0.25rem solid #007bff !important;
 }
