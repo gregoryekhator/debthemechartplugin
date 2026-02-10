@@ -16,10 +16,13 @@
 
     <div class="row no-gutters flex-nowrap">
         <div class="col-md-9 px-2">
-            <div class="ai-insight-box p-4 mb-4 bg-white shadow-sm border-left-primary">
+                <div class="ai-insight-box p-4 mb-4 bg-white shadow-sm border-left-primary">
                 <h6 class="text-primary font-weight-bold"><i class="fa fa-magic"></i> AI ANALYSIS & INSIGHTS</h6>
-                <p class="h5 mb-0 mt-2 text-dark">{{ai_hero_text}}</p>
-            </div>
+                <p class="h5 mb-0 mt-2 {{#is_alert}}text-danger{{/is_alert}}{{^is_alert}}text-success{{/is_alert}}">
+                    {{ai_hero_text}}
+                </p>
+                </div>
+            
 
             <div class="main-chart-card p-4 bg-white shadow-sm rounded border">
                 <h2 class="mb-4 text-dark">{{chart_title}}</h2>
@@ -30,15 +33,16 @@
         </div>
 
         <div class="col-md-3 px-2">
-            {{#history_blocks}}
-            <div class="history-sidebar-card mb-4 p-3 bg-white shadow-sm border rounded">
+        {{#history_blocks}}
+            <div class="history-sidebar-card mb-4 p-3 bg-white shadow-sm border rounded" style="overflow: hidden;">
                 <span class="text-muted small font-weight-bold text-uppercase d-block">{{title}}</span>
                 <span class="text-primary d-block mb-2 font-weight-bold">{{subtitle}}</span>
-                <div class="sidebar-chart-wrapper">
-                    {{{content}}}
-                </div>
+                
+            <div class="sidebar-chart-wrapper" style="transform: scale(0.7); transform-origin: top left; height: 180px;">
+                {{{content}}}
             </div>
-            {{/history_blocks}}
+        </div>
+        {{/history_blocks}}
         </div>
     </div>
 </div>

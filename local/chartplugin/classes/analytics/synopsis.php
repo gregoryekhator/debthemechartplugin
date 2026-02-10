@@ -3,113 +3,68 @@ namespace local_chartplugin\analytics;
 
 defined('MOODLE_INTERNAL') || die();
 
-use core\chart_bar;
+use core\chart_base;
 use core\chart_series;
 
 class synopsis {
-
-    public static function build_dynamic_chart($type, $is_mini = false) {
-        global $DB;
+    /**
+     * Builds a chart using real database values.
+     */
+    public static function build_dynamic_chart($type, $is_sidebar = false) {
+        global $USER;
         
-        $chart = new chart_bar();
+        // 1. Initialize the Moodle Chart API
+        $chart = new \core\chart_bar();
+        
+        // 2. Fetch the data using our new lib.php logic
+        $userid = $USER->id;
+        
+        if ($type === 'lowest') {
+            $data_records = local_chartplugin_get_lowest_courses($userid);
+        } else {
+            // Default/Synopsis logic: For now, we'll pull all course grades
+            $data_records = self::get_all_user_grades($userid);
+        }
+
         $labels = [];
         $values = [];
-        $series_label = "Data";
-        $params = [];
-        
-        // Time window: 30 days
-        $thirtydaysago = time() - (30 * 24 * 60 * 60);
 
-        // UI Adjustments for Thumbnails
-        if ($is_mini) {
-            $chart->set_legend_options(['display' => false]);
-            // Simplified view for sidebar
+        foreach ($data_records as $record) {
+            $labels[] = $record->itemname ?: 'Course Total';
+            $values[] = (float)$record->finalgrade;
         }
 
-        switch ($type) {
-            case 'best':
-                $sql = "SELECT c.shortname, cs.avggrade as value 
-                        FROM {local_chartplugin_course_stats} cs
-                        JOIN {course} c ON c.id = cs.courseid
-                        ORDER BY value DESC LIMIT 5";
-                break;
-
-            case 'lowest':
-                $sql = "SELECT c.shortname, cs.avggrade as value 
-                        FROM {local_chartplugin_course_stats} cs
-                        JOIN {course} c ON c.id = cs.courseid
-                        ORDER BY value ASC LIMIT 5";
-                break;
-
-            case '30day':
-                $sql = "SELECT c.shortname, COUNT(ue.id) as value
-                        FROM {course} c
-                        JOIN {enrol} e ON e.courseid = c.id
-                        JOIN {user_enrolments} ue ON ue.enrolid = e.id
-                        WHERE ue.timecreated >= ?
-                        GROUP BY c.id, c.shortname ORDER BY value DESC LIMIT 8";
-                $params = [$thirtydaysago];
-                break;
-
-            case 'freq':
-                $sql = "SELECT DAYNAME(FROM_UNIXTIME(timecreated)) as shortname, COUNT(id) as value
-                        FROM {logstore_standard_log}
-                        WHERE timecreated >= ?
-                        GROUP BY shortname
-                        ORDER BY FIELD(shortname, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')";
-                $params = [$thirtydaysago];
-                break;
-
-            case 'style':
-                $sql = "SELECT 
-                            CASE 
-                                WHEN component IN ('mod_resource', 'mod_book') THEN 'Reading'
-                                WHEN component IN ('mod_quiz', 'mod_hvp') THEN 'Interactive'
-                                WHEN component IN ('mod_forum', 'mod_glossary') THEN 'Social'
-                                ELSE 'Other'
-                            END as shortname, COUNT(id) as value
-                        FROM {logstore_standard_log}
-                        WHERE timecreated >= ?
-                        GROUP BY shortname ORDER BY value DESC";
-                $params = [$thirtydaysago];
-                break;
-
-            case 'cohort':
-                $sql = "SELECT ch.name as shortname, COUNT(cm.id) as value
-                        FROM {cohort} ch
-                        JOIN {cohort_members} cm ON cm.cohortid = ch.id
-                        GROUP BY ch.id, ch.name LIMIT 8";
-                break;
-
-            case 'plan':
-                $sql = "SELECT lp.name as shortname, COUNT(lpc.id) as value
-                        FROM {competency_plan} lp
-                        LEFT JOIN {competency_plancomp} lpc ON lpc.planid = lp.id
-                        GROUP BY lp.id, lp.name LIMIT 8";
-                break;
-
-            default: // synopsis_total
-                $sql = "SELECT c.shortname, COUNT(ue.id) as value
-                        FROM {course} c
-                        JOIN {enrol} e ON e.courseid = c.id
-                        JOIN {user_enrolments} ue ON ue.enrolid = e.id
-                        GROUP BY c.id, c.shortname ORDER BY value DESC LIMIT 8";
-                break;
-        }
-
-        $records = $DB->get_records_sql($sql, $params);
-
-        if ($records) {
-            foreach ($records as $record) {
-                $labels[] = $record->shortname;
-                $values[] = (float)$record->value;
-            }
-        }
-
-        $chart->set_labels($labels);
-        $series = new chart_series($series_label, $values);
+        // 3. Populate the Chart Series
+        $series = new chart_series('Performance (%)', $values);
+        //$series->set_type(chart_series::TYPE_BAR);
         $chart->add_series($series);
-        
+        $chart->set_labels($labels);
+
+        // 4. Handle Sidebar Scaling (thumbnail mode)
+        if ($is_sidebar) {
+            $chart->set_title(''); // Cleaner look for sidebar
+        }
+
         return $chart;
+    }
+
+    public static function build_trend_chart() {
+    $chart = new \core\chart_line(); // Switches from Bar to Line
+    $series = new \core\chart_series('Your Progress', [78, 82, 85, 80, 75, 65]);
+    $chart->add_series($series);
+    $chart->set_labels(['Sept', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb']);
+    return $chart;
+    }
+
+    /**
+     * Helper to get all course-level grades for the user.
+     */
+    private static function get_all_user_grades($userid) {
+        global $DB;
+        $sql = "SELECT gi.id, gi.itemname, gg.finalgrade 
+                FROM {grade_grades} gg
+                JOIN {grade_items} gi ON gg.itemid = gi.id
+                WHERE gg.userid = :userid AND gi.itemtype = 'course'";
+        return $DB->get_records_sql($sql, ['userid' => $userid]);
     }
 }

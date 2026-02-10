@@ -1,49 +1,69 @@
-<?php
-// /var/www/html/moodle_test/local/chartplugin/index.php
+        <?php
+        // /var/www/html/moodle_test/local/chartplugin/index.php
 
-require('../../config.php');
-require_login();
+        require('../../config.php');
+        require_once($CFG->dirroot . '/local/chartplugin/lib.php');
+        require_login();
 
-// 1. Mandatory Moodle Lifecycle: Set context before any output
-$context = context_system::instance();
-$PAGE->set_context($context);
+        // 1. Mandatory Moodle Lifecycle: Set context before any output
+        $context = context_system::instance();
+        $PAGE->set_context($context);
 
-$type = optional_param('type', 'synopsis', PARAM_ALPHANUMEXT);
-$PAGE->set_url(new moodle_url('/local/chartplugin/index.php', ['type' => $type]));
+        $type = optional_param('type', 'synopsis', PARAM_ALPHANUMEXT);
+        $PAGE->set_url(new moodle_url('/local/chartplugin/index.php', ['type' => $type]));
 
-// 2. Layout & Title
-$PAGE->set_pagelayout('report');
-$PAGE->set_title('Learning Analytics');
+        // 2. Layout & Title
+        $PAGE->set_pagelayout('report');
+        $PAGE->set_title('Learning Analytics');
 
-// 3. History Stack Logic
-if (!isset($SESSION->history_stack)) {
-    $SESSION->history_stack = ['synopsis', 'synopsis', 'synopsis'];
+        // 3. History Stack Logic
+        if (!isset($SESSION->history_stack)) {
+            $SESSION->history_stack = ['synopsis', 'synopsis', 'synopsis'];
+        }
+        if ($type !== $SESSION->history_stack[0]) {
+            array_unshift($SESSION->history_stack, $type);
+            $SESSION->history_stack = array_slice($SESSION->history_stack, 0, 3);
+        }
+
+        $labels = [
+            'synopsis' => 'Synopsis (to date)', 'best' => 'Best Courses', 
+            'cohort' => 'Cohort Performance', 'plan' => 'Best Learning Plan',
+            '30day' => '30 Day Synopsis', 'lowest' => 'Lowest Courses', 
+            'freq' => 'Study Frequency', 'style' => 'Preferred Learning Style'
+        ];
+
+        echo $OUTPUT->header();
+
+                    // Fetch data points
+            $courseid = optional_param('id', 2, PARAM_INT); 
+            $cohort_avg = (float)local_chartplugin_get_cohort_average($courseid);
+            $user_grade = local_chartplugin_get_user_grade($courseid, $USER->id);
+
+            // AI Insight Logic
+$diff = $user_grade - $cohort_avg;
+$is_alert = false; // Default to green/neutral
+
+if ($user_grade == 0) {
+    $ai_message = "Analysis pending. You haven't received a final grade for this course yet.";
+} else if ($diff >= 0) {
+    $ai_message = "Great work! You are performing " . number_format($diff, 2) . "% above the cohort average.";
+} else {
+    $ai_message = "Alert: You are currently " . number_format(abs($diff), 2) . "% below the cohort average. Consider reviewing the 'Lowest Courses' data.";
+    $is_alert = true; // Trigger the red color
 }
-if ($type !== $SESSION->history_stack[0]) {
-    array_unshift($SESSION->history_stack, $type);
-    $SESSION->history_stack = array_slice($SESSION->history_stack, 0, 3);
-}
-
-$labels = [
-    'synopsis' => 'Synopsis (to date)', 'best' => 'Best Courses', 
-    'cohort' => 'Cohort Performance', 'plan' => 'Best Learning Plan',
-    '30day' => '30 Day Synopsis', 'lowest' => 'Lowest Courses', 
-    'freq' => 'Study Frequency', 'style' => 'Preferred Learning Style'
-];
-
-echo $OUTPUT->header();
 
 echo $OUTPUT->render_from_template('local_chartplugin/analytics_page', [
     'chart_title' => $labels[$type],
     'main_chart' => $OUTPUT->render(\local_chartplugin\analytics\synopsis::build_dynamic_chart($type, false)),
-    'ai_hero_text' => "Analysis complete. Performance is stable at 66.67%.",
-    'buttons' => array_map(function($k, $v) use ($type) {
-        return ['label' => $v, 'url' => new moodle_url('/local/chartplugin/index.php', ['type' => $k]), 'active' => ($type == $k)];
-    }, array_keys($labels), $labels),
-    'history_blocks' => [
-        ['title' => 'Last Chart', 'subtitle' => $labels[$SESSION->history_stack[1]], 'content' => $OUTPUT->render(\local_chartplugin\analytics\synopsis::build_dynamic_chart($SESSION->history_stack[1], true))],
-        ['title' => 'Previous Chart', 'subtitle' => $labels[$SESSION->history_stack[2]], 'content' => $OUTPUT->render(\local_chartplugin\analytics\synopsis::build_dynamic_chart($SESSION->history_stack[2], true))]
-    ]
-]);
+    'ai_hero_text' => $ai_message,
+    'is_alert' => $is_alert, // Pass the flag to Mustache
+            'buttons' => array_map(function($k, $v) use ($type) {
+                return ['label' => $v, 'url' => new moodle_url('/local/chartplugin/index.php', ['type' => $k]), 'active' => ($type == $k)];
+            }, array_keys($labels), $labels),
+            'history_blocks' => [
+                ['title' => 'Last Chart', 'subtitle' => $labels[$SESSION->history_stack[1]], 'content' => $OUTPUT->render(\local_chartplugin\analytics\synopsis::build_dynamic_chart($SESSION->history_stack[1], true))],
+                ['title' => 'Previous Chart', 'subtitle' => $labels[$SESSION->history_stack[2]], 'content' => $OUTPUT->render(\local_chartplugin\analytics\synopsis::build_dynamic_chart($SESSION->history_stack[2], true))]
+            ]
+        ]);
 
-echo $OUTPUT->footer();
+        echo $OUTPUT->footer();
