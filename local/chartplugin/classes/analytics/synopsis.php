@@ -7,22 +7,25 @@ use core\chart_base;
 use core\chart_series;
 
 class synopsis {
+
     /**
-     * Builds a chart using real database values.
+     * Builds the main chart using real database values.
      */
     public static function build_dynamic_chart($type, $is_sidebar = false) {
         global $USER;
         
-        // 1. Initialize the Moodle Chart API
-        $chart = new \core\chart_bar();
-        
-        // 2. Fetch the data using our new lib.php logic
         $userid = $USER->id;
+        
+        // Route to the new innovative view if the 'plan' button is clicked.
+        if ($type === 'plan') {
+            return self::build_learning_plan_chart($userid);
+        }
+
+        $chart = new \core\chart_bar();
         
         if ($type === 'lowest') {
             $data_records = local_chartplugin_get_lowest_courses($userid);
         } else {
-            // Default/Synopsis logic: For now, we'll pull all course grades
             $data_records = self::get_all_user_grades($userid);
         }
 
@@ -34,31 +37,67 @@ class synopsis {
             $values[] = (float)$record->finalgrade;
         }
 
-        // 3. Populate the Chart Series
         $series = new chart_series('Performance (%)', $values);
-        //$series->set_type(chart_series::TYPE_BAR);
         $chart->add_series($series);
         $chart->set_labels($labels);
 
-        // 4. Handle Sidebar Scaling (thumbnail mode)
-        if ($is_sidebar) {
-            $chart->set_title(''); // Cleaner look for sidebar
+        return $chart;
+    }
+
+    /**
+     * Innovative Personalization: Gap Analysis for Learning Plans.
+     */
+    public static function build_learning_plan_chart($userid = 2) {
+        global $DB;
+        
+        $plan = $DB->get_record('competency_plan', ['userid' => $userid, 'status' => 1], '*', IGNORE_MULTIPLE);
+        $chart = new \core\chart_bar();
+        
+        if (!$plan) {
+            $chart->set_title('Status: All Competencies On Track');
+            $series = new \core\chart_series('No Plan Needed', [100]);
+            $chart->add_series($series);
+            $chart->set_labels(['Current Standing']);
+        } else {
+            $prediction = $DB->get_field('local_chartplugin_trends', 'prediction', ['userid' => $userid]) ?: 0;
+            
+            $chart->set_title('AI Gap Analysis: Mastery vs. Goal');
+            
+            // Red bar: The current ML forecast
+            $series1 = new \core\chart_series('ML Forecasted Mastery', [(float)$prediction]);
+            $series1->set_color('#dc3545'); 
+            
+            // Green bar: The target competency level
+            $series2 = new \core\chart_series('Target Proficiency', [85]); 
+            $series2->set_color('#28a745'); 
+            
+            $chart->add_series($series1);
+            $chart->add_series($series2);
+            $chart->set_labels(['Recovery Target: ' . $plan->name]);
         }
 
         return $chart;
     }
 
-    public static function build_trend_chart() {
-    $chart = new \core\chart_line(); // Switches from Bar to Line
-    $series = new \core\chart_series('Your Progress', [78, 82, 85, 80, 75, 65]);
-    $chart->add_series($series);
-    $chart->set_labels(['Sept', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb']);
-    return $chart;
+    public static function build_trend_chart($userid = 2) {
+        global $DB;
+        $chart = new \core\chart_line();
+        $record = $DB->get_record('local_chartplugin_trends', ['userid' => $userid]);
+        $data = ($record && !empty($record->monthly_trend)) ? json_decode($record->monthly_trend, true) : [];
+
+        if (!empty($data)) {
+            $series = new \core\chart_series('Your Progress', array_values($data));
+            $series->set_color('#dc3545'); 
+            $series->set_smooth(true);
+            $chart->add_series($series);
+            $chart->set_labels(array_keys($data));
+        } else {
+            $series = new \core\chart_series('No Cache Found', [0,0,0,0,0,0]);
+            $chart->add_series($series);
+        }
+        return $chart;
     }
 
-    /**
-     * Helper to get all course-level grades for the user.
-     */
     private static function get_all_user_grades($userid) {
         global $DB;
         $sql = "SELECT gi.id, gi.itemname, gg.finalgrade 
@@ -67,4 +106,4 @@ class synopsis {
                 WHERE gg.userid = :userid AND gi.itemtype = 'course'";
         return $DB->get_records_sql($sql, ['userid' => $userid]);
     }
-}
+} // <--- This brace closes the class. Nothing should be after this.
