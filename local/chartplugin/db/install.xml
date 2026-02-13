@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/chartplugin/db" VERSION="20260119" COMMENT="XMLDB file for local_chartplugin"
+<XMLDB PATH="local/chartplugin/db" VERSION="20260211" COMMENT="XMLDB file for local_chartplugin"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
->
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
   <TABLES>
     <TABLE NAME="local_chartplugin_course_stats" COMMENT="Course statistics for analytics charts">
       <FIELDS>
@@ -18,6 +17,24 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_chartplugin_trends" COMMENT="Storage for pre-computed ML trends and predictions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" UNSIGNED="true" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" UNSIGNED="true" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" UNSIGNED="true" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="monthly_trend" TYPE="text" NOTNULL="false" COMMENT="JSON encoded trend data"/>
+        <FIELD NAME="cohort_avg" TYPE="number" LENGTH="10" DECIMALS="5" NOTNULL="true" DEFAULT="0.00000"/>
+        <FIELD NAME="prediction" TYPE="number" LENGTH="10" DECIMALS="5" NOTNULL="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" UNSIGNED="true" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="user_course" UNIQUE="true" FIELDS="userid, courseid"/>
       </INDEXES>
     </TABLE>
   </TABLES>

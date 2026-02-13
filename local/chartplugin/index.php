@@ -54,21 +54,26 @@ if ($user_grade == 0) {
     $is_alert = true;
 }
 
-// PERSONALIZATION LOGIC: Identify "Correctional" context
-$correctional_tabs = ['plan', 'lowest', 'synopsis'];
-$is_viewing_risk = in_array($type, $correctional_tabs);
-
-// Check for AI-generated Learning Plan
-$planid = $DB->get_field('competency_plan', 'id', ['userid' => $userid, 'status' => 1], IGNORE_MULTIPLE);
-
-// FIXED URL: Using the correct tool path to prevent 404
-$plan_url = '';
-if ($planid) {
-    $plan_url = new moodle_url('/admin/tool/lp/plan.php', ['id' => $planid]);
+// PERSONALIZATION GATE: Only show recovery if a plan exists AND user is lagging or looking at risk data
+$planid = 0;
+try {
+    $planid = $DB->get_field('competency_plan', 'id', ['userid' => $userid, 'status' => 1], IGNORE_MULTIPLE);
+} catch (Exception $e) {
+    // Fallback if competency table is missing or errors
+    $planid = 0;
 }
 
-// Show recovery if a plan exists AND (User is at risk OR in a risk-related tab)
-$show_recovery = ($planid && ($is_alert || $is_viewing_risk));
+$correctional_tabs = ['plan', 'lowest', 'synopsis'];
+$is_risk_context = in_array($type, $correctional_tabs);
+
+// Logic: Button appears if (plan exists) AND (either we are alerted OR on a risk tab)
+$show_recovery = ($planid && ($is_alert || $is_risk_context));
+
+$plan_url_string = '';
+if ($planid) {
+    $plan_url = new moodle_url('/admin/tool/lp/plan.php', ['id' => $planid]);
+    $plan_url_string = $plan_url->out(false);
+}
 
 echo $OUTPUT->render_from_template('local_chartplugin/analytics_page', [
     'chart_title' => $labels[$type],
@@ -76,7 +81,7 @@ echo $OUTPUT->render_from_template('local_chartplugin/analytics_page', [
     'ai_hero_text' => $ai_message,
     'is_alert' => $is_alert,
     'show_recovery' => $show_recovery,
-    'plan_url' => $plan_url ? $plan_url->out(false) : '',
+    'plan_url' => $plan_url_string,
     'buttons' => array_map(function($k, $v) use ($type) {
         return ['label' => $v, 'url' => new moodle_url('/local/chartplugin/index.php', ['type' => $k]), 'active' => ($type == $k)];
     }, array_keys($labels), $labels),

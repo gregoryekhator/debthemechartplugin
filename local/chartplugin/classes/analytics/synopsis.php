@@ -21,10 +21,12 @@ class synopsis {
             return self::build_learning_plan_chart($userid);
         }
 
-        $chart = new \core\chart_bar();
+        // Use a line chart for sidebars to maintain "Stable Beauty" aesthetic.
+        $chart = $is_sidebar ? new \core\chart_line() : new \core\chart_bar();
         
         if ($type === 'lowest') {
-            $data_records = local_chartplugin_get_lowest_courses($userid);
+            // FIX: Added backslash to call global function from lib.php
+            $data_records = \local_chartplugin_get_lowest_courses($userid);
         } else {
             $data_records = self::get_all_user_grades($userid);
         }
@@ -38,6 +40,15 @@ class synopsis {
         }
 
         $series = new chart_series('Performance (%)', $values);
+        
+        // Visual polish for sidebars
+        if ($is_sidebar) {
+            $series->set_color('#6f42c1'); // Distinct purple for history
+            if ($chart instanceof \core\chart_line) {
+                $series->set_smooth(true);
+            }
+        }
+
         $chart->add_series($series);
         $chart->set_labels($labels);
 
@@ -63,11 +74,9 @@ class synopsis {
             
             $chart->set_title('AI Gap Analysis: Mastery vs. Goal');
             
-            // Red bar: The current ML forecast
             $series1 = new \core\chart_series('ML Forecasted Mastery', [(float)$prediction]);
             $series1->set_color('#dc3545'); 
             
-            // Green bar: The target competency level
             $series2 = new \core\chart_series('Target Proficiency', [85]); 
             $series2->set_color('#28a745'); 
             
@@ -92,7 +101,7 @@ class synopsis {
             $chart->add_series($series);
             $chart->set_labels(array_keys($data));
         } else {
-            $series = new \core\chart_series('No Cache Found', [0,0,0,0,0,0]);
+            $series = new \core\chart_series('No Data Found', [0,0,0,0,0,0]);
             $chart->add_series($series);
         }
         return $chart;
@@ -106,4 +115,4 @@ class synopsis {
                 WHERE gg.userid = :userid AND gi.itemtype = 'course'";
         return $DB->get_records_sql($sql, ['userid' => $userid]);
     }
-} // <--- This brace closes the class. Nothing should be after this.
+}
