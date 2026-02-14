@@ -1,51 +1,56 @@
 <div class="gold-v2-container">
-    <div class="dashboard-header-container p-4 mb-4">
-        <h2 class="text-white mb-4">Welcome to Debonair Learning</h2>
-        <div class="container-fluid px-0"> 
-            <div class="row no-gutters justify-content-center">
-                {{#buttons}}
-                <div class="button-column">
-                    <a href="{{{url}}}" class="btn btn-block {{#active}}btn-dark{{/active}}{{^active}}btn-light{{/active}} shadow-sm py-2">
-                        {{label}}
-                    </a>
-                </div>
-                {{/buttons}}
-            </div>
+    <style>
+        .cockpit-header { background: #007bff; padding: 1.5rem; border-radius: 8px 8px 0 0; color: white; }
+        .nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+        .ai-alert-box { border-left: 5px solid #dc3545; background: #fff; padding: 1.2rem; position: relative; }
+        .sidebar-wrapper { height: 160px; overflow: hidden; background: #fdfdfd; border: 1px solid #eee; }
+        .sidebar-scaler { transform: scale(0.55); transform-origin: 0 0; width: 181%; height: 181%; }
+        /* Cockpit Switch Styling */
+        .custom-switch .custom-control-label::before { background-color: #ced4da; }
+        .custom-switch .custom-control-input:checked~.custom-control-label::before { background-color: #28a745; }
+    </style>
+
+    <div class="cockpit-header shadow-sm">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">Debonair Learning Flight Deck</h2>
+            <span class="badge badge-warning">Enterprise Mode</span>
+        </div>
+        <div class="nav-grid">
+            {{#buttons}}
+            <a href="{{{url}}}" class="btn btn-sm {{#active}}btn-dark{{/active}}{{^active}}btn-light{{/active}} shadow-sm">{{label}}</a>
+            {{/buttons}}
         </div>
     </div>
 
-    <div class="row no-gutters flex-nowrap">
-        <div class="col-md-9 px-2">
-            <div class="ai-insight-box p-4 mb-4 bg-white shadow-sm border-left-primary position-relative">
-                <h6 class="text-primary font-weight-bold"><i class="fa fa-magic"></i> AI ANALYSIS & INSIGHTS</h6>
-                <div class="d-flex justify-content-between align-items-center mt-2">
-                    <p class="h5 mb-0 {{#is_alert}}text-danger{{/is_alert}}{{^is_alert}}text-success{{/is_alert}}">
-                        {{ai_hero_text}}
-                    </p>
-                    {{#show_recovery}}
-                    <a href="{{{plan_url}}}" class="btn btn-success">
-                        <i class="fa fa-graduation-cap"></i> View Recovery Plan
-                    </a>
-                    {{/show_recovery}}
-                </div>
-            </div>
-
-            <div class="main-chart-card p-4 bg-white shadow-sm rounded border">
-                <h2 class="mb-4 text-dark">{{chart_title}}</h2>
-                <div class="chart-container">
-                    {{{main_chart}}}
-                </div>
+    <div class="ai-alert-box shadow-sm mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <p class="h5 mb-1 font-weight-bold {{#is_alert}}text-danger{{/is_alert}}">{{ai_hero_text}}</p>
+            <div class="custom-control custom-switch d-inline-block mr-3">
+                <input type="checkbox" class="custom-control-input" id="aiToggle" checked>
+                <label class="custom-control-label small text-muted" for="aiToggle">AI Insight Active</label>
             </div>
         </div>
+        {{#show_recovery}}<a href="{{{plan_url}}}" class="btn btn-success btn-sm">Engage Recovery Plan</a>{{/show_recovery}}
+    </div>
 
-        <div class="col-md-3 px-2">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="bg-white p-4 shadow-sm rounded border">
+                <div class="main-chart-render">{{{main_chart}}}</div>
+            </div>
+            {{#is_style_view}}
+            <div class="alert alert-info mt-3 shadow-sm">
+                <strong>Modality Logic:</strong> Your spider-web shows high Kinesthetic engagement. We recommend the "Simulation" track.
+            </div>
+            {{/is_style_view}}
+        </div>
+
+        <div class="col-md-3">
             {{#history_blocks}}
-            <div class="history-sidebar-card mb-4 p-3 bg-white shadow-sm border rounded" style="overflow: hidden;">
-                <span class="text-muted small font-weight-bold text-uppercase d-block">{{title}}</span>
-                <span class="text-primary d-block mb-2 font-weight-bold">{{subtitle}}</span>
-                <div class="sidebar-chart-wrapper" style="transform: scale(0.7); transform-origin: top left; height: 180px;">
-                    {{{content}}}
-                </div>
+            <div class="card mb-3 p-2 shadow-sm border-0 bg-light">
+                <small class="text-uppercase text-muted font-weight-bold">{{title}}</small>
+                <strong class="text-primary d-block small mb-2">{{subtitle}}</strong>
+                <div class="sidebar-wrapper"><div class="sidebar-scaler">{{{content}}}</div></div>
             </div>
             {{/history_blocks}}
         </div>
