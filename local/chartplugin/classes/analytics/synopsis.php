@@ -6,58 +6,127 @@ use core\chart_series;
 
 class synopsis {
 
-    /**
-     * The Master Menu Definition
-     */
     public static function get_button_definitions() {
         return [
-            'synopsis' => 'Synopsis (to date)', 
-            'best'     => 'Best Courses',
-            'cohort'   => 'Cohort Performance', 
-            'plan'     => 'Best Learning Plan',
-            '30day'    => '30 Day Synopsis', 
-            'lowest'   => 'Lowest Courses',
-            'freq'     => 'Study Frequency', 
-            'style'    => 'Preferred Learning Style'
+            'synopsis' => [
+                'label' => 'Synopsis (to date)', 
+                'title' => "Your overall performance since 'sign-up/restart'",
+                'tooltip' => "Cumulative performance snapshot. Note: Adopt learning strategies congruent with your plan to improve results."
+            ],
+            'best' => [
+                'label' => 'Best Courses', 
+                'title' => 'Your best courses by scores / performance vs the class performance',
+                'tooltip' => 'Modules where you have demonstrated mastery. Click to see what you did right here!'
+            ],
+            'cohort' => [
+                'label' => 'Cohort Performance', 
+                'title' => 'Grade distribution curve in your cohort',
+                'tooltip' => "Grade distribution curve in your cohort. Mouse over for more information to improve."
+            ],
+            'plan' => [
+                'label' => 'Best Learning Plan', 
+                'title' => 'Best competency / learning plan performance over the next 30 days',
+                'tooltip' => "The best competency / learning plan should result in this performance over the next 30 days."
+            ],
+            '30day' => [
+                'label' => '30 Day Synopsis', 
+                'title' => 'Your performance over the last month vs the class performance',
+                'tooltip' => 'Your performance over the last month vs the class performance. Turning up the dial starts here!'
+            ],
+            'lowest' => [
+                'label' => 'Lowest Courses', 
+                'title' => 'Your lowest courses by score / performance vs the class',
+                'tooltip' => 'Your lowest courses by score / performance vs the class. The best recovery plan through gap analysis and tips.'
+            ],
+            'freq' => [
+                'label' => 'Study Frequency', 
+                'title' => 'Your work rate relative to your class',
+                'tooltip' => 'This is your work rate relative to your class. Commitment starts with turning up the dial.'
+            ],
+            'style' => [
+                'label' => 'Preferred Learning Style', 
+                'title' => 'Your preferred learning style as revealed by our learning analytics',
+                'tooltip' => "Your preferred learning style as revealed by our analytics. Adopt strategies congruent with your plan."
+            ]
         ];
+    }
+
+    public static function save_view_history($userid, $type, $render) {
+        global $DB;
+        $record = new \stdClass();
+        $record->userid = $userid;
+        $record->chart_type = (string)$type; 
+        $record->render_type = $render;
+        $record->data_snapshot = json_encode(['timestamp' => time(), 'status' => 'active']);
+        $record->timecreated = time();
+        return $DB->insert_record('local_chartplugin_history', $record);
+    }
+
+    public static function get_history_blocks($userid) {
+        global $DB, $OUTPUT;
+        $records = $DB->get_records('local_chartplugin_history', ['userid' => $userid], 'timecreated DESC', '*', 1, 2);
+        
+        $blocks = [];
+        $i = 0;
+        $defs = self::get_button_definitions();
+
+        foreach ($records as $rec) {
+            $type = $rec->chart_type;
+            $title_label = ($i === 0) ? "Last View" : "Previous View";
+            $desc = ($i === 0) ? "Your last chart view revealed this performance:" : "Before the last view, you viewed this:";
+
+            $blocks[] = [
+                'title' => $title_label . ": " . ($defs[$type]['label'] ?? 'Archive'),
+                'description' => $desc,
+                'content' => $OUTPUT->render(self::build_dynamic_chart($type, true, 'line'))
+            ];
+            $i++;
+        }
+        return $blocks;
     }
 
     public static function get_template_data($userid, $current_type, $render) {
         $buttons = [];
-        foreach (self::get_button_definitions() as $type => $label) {
+        $defs = self::get_button_definitions();
+        foreach ($defs as $type => $data) {
             $buttons[] = [
-                'label' => $label,
+                'label' => $data['label'],
                 'url' => (new \moodle_url('/local/chartplugin/index.php', ['type' => $type, 'render' => $render]))->out(false),
-                'active' => ($type === $current_type)
+                'active' => ((string)$type === (string)$current_type)
             ];
         }
 
         return [
             'buttons' => $buttons,
             'ai_hero_text' => 'Alert: You are 10.67% below average. ML Forecast: Next month\'s predicted grade is 67%.',
+            'is_bar' => ($render === 'bar'),
+            'is_line' => ($render === 'line'),
+            'is_pie' => ($render === 'pie'),
+            'bar_url' => (new \moodle_url('/local/chartplugin/index.php', ['type' => $current_type, 'render' => 'bar']))->out(false),
+            'line_url' => (new \moodle_url('/local/chartplugin/index.php', ['type' => $current_type, 'render' => 'line']))->out(false),
+            'pie_url' => (new \moodle_url('/local/chartplugin/index.php', ['type' => $current_type, 'render' => 'pie']))->out(false),
         ];
     }
 
     public static function build_dynamic_chart($type, $is_sidebar = false, $render_type = 'bar') {
         global $USER;
-        
-        // Factory Routing
-        if ($type === 'plan') return self::build_learning_plan_chart($USER->id, $render_type);
-        if ($type === 'style') return self::build_learning_style_chart($USER->id, $render_type);
-        if ($type === 'cohort' && !$is_sidebar) return self::build_distribution_chart($render_type);
-        if ($type === 'freq') return self::build_study_frequency_chart($USER->id, $render_type);
+        $defs = self::get_button_definitions();
+        $meta = $defs[$type] ?? ['title' => 'Activity Analysis', 'tooltip' => ''];
 
-        $chart = self::get_chart_instance($render_type, $is_sidebar);
+        $chart = ($is_sidebar) ? new \core\chart_line() : self::get_chart_instance($render_type, false);
         
-        // Mock Data for Synopsis/30day/Best/Lowest
+        if (!$is_sidebar) {
+            $chart->set_title($meta['title']);
+        }
+
         $labels = ['Course A', 'Course B', 'Course C'];
         $user_vals = ($type === 'lowest') ? [40, 45, 50] : [75, 82, 68];
         
-        $s1 = new chart_series('My Performance (%)', $user_vals);
-        $s1->set_color('#6f42c1'); 
-        $chart->add_series($s1);
-        
+        $series = new chart_series($is_sidebar ? 'Historical %' : 'Performance %', $user_vals);
+        $series->set_color($is_sidebar ? '#dc3545' : '#6f42c1'); 
+        $chart->add_series($series);
         $chart->set_labels($labels);
+        
         return $chart;
     }
 
@@ -68,37 +137,5 @@ class synopsis {
             case 'pie':  return new \core\chart_pie();
             default:     return new \core\chart_bar();
         }
-    }
-
-    public static function build_study_frequency_chart($userid, $render_type = 'pie') {
-        $chart = self::get_chart_instance($render_type, false);
-        $chart->add_series(new chart_series('Work Rate', [45, 30, 25]));
-        $chart->set_labels(['Active', 'Reflective', 'Practical']);
-        return $chart;
-    }
-
-    public static function build_distribution_chart($render_type = 'bar') {
-        $chart = self::get_chart_instance($render_type, false);
-        $dist = \local_chartplugin_get_grade_distribution(2);
-        $chart->add_series(new chart_series('Students', array_values($dist)));
-        $chart->set_labels(array_keys($dist));
-        return $chart;
-    }
-
-    public static function build_learning_style_chart($userid, $render_type = 'line') {
-        $chart = self::get_chart_instance($render_type, false);
-        $series = new chart_series('Preference', [85, 40, 70, 55, 90]);
-        if ($render_type === 'line') $series->set_fill(true);
-        $chart->add_series($series);
-        $chart->set_labels(['Visual', 'Auditory', 'Social', 'Reflective', 'Kinesthetic']);
-        return $chart;
-    }
-
-    public static function build_learning_plan_chart($userid, $render_type = 'bar') {
-        $chart = self::get_chart_instance($render_type, false);
-        $chart->add_series(new chart_series('ML Forecast', [67]));
-        $chart->add_series(new chart_series('Target', [85]));
-        $chart->set_labels(['Current Plan Mastery']);
-        return $chart;
     }
 }
