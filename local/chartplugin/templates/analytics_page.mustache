@@ -1,50 +1,82 @@
-<div class="flight-deck-container">
+<div id="deb-dashboard-root" class="container-fluid p-0">
     <style>
-        /* CSS Force for Titles */
-        .chart-area text[text-anchor="middle"] { font-size: 2em !important; font-weight: bold !important; fill: #333 !important; }
-        
-        /* Grid Alignment */
-        .btn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; }
-        @media (max-width: 991px) { .btn-grid { grid-template-columns: repeat(2, 1fr); } }
-
-        .flight-deck-main-grid { display: flex; flex-wrap: wrap; margin: 0 -15px; width: 100%; }
-        .main-content-area { flex: 0 0 75%; max-width: 75%; padding: 0 15px; }
-        .sidebar-content-area { flex: 0 0 25%; max-width: 25%; padding: 0 15px; }
-
-        @media (max-width: 1024px) { 
-            .main-content-area, .sidebar-content-area { flex: 0 0 100%; max-width: 100%; }
+        /* CORE STABILITY */
+        #deb-dashboard-root { 
+            overflow: hidden; 
+            width: 100%; 
         }
 
-        /* Highlight Force */
-        .active-btn { background-color: #212529 !important; color: white !important; border: 2px solid #fff !important; box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important; }
+        /* BUTTON GRID */
+        .deb-flex-grid { display: flex; flex-wrap: wrap; margin: -5px; }
+        .deb-btn-container { flex: 1 1 23%; padding: 5px; min-width: 150px; }
+        
+        /* THE TIDY LAYOUT: Fluid Flex */
+        .deb-main-content-row { 
+            display: flex; 
+            flex-direction: row; 
+            gap: 20px; 
+            margin-top: 20px;
+        }
+
+        .deb-chart-main { 
+            flex: 3; /* Takes 75% of space fluently */
+            min-width: 0; 
+        }
+
+        .deb-sidebar-history { 
+            flex: 1; /* Takes 25% of space fluently */
+            min-width: 260px;
+        }
+
+        /* HIGHLIGHTS & BADGES */
+        .deb-active-now { 
+            background-color: #001f3f !important; 
+            color: #ffffff !important; 
+            border: 2px solid #ffffff !important; 
+            font-weight: bold !important; 
+        }
+        .deb-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
+
+        /* IPAD PRO / TABLET REFINEMENT */
+        @media (max-width: 1200px) { 
+            .deb-main-content-row { flex-direction: column; } 
+            .deb-sidebar-history { width: 100%; }
+            .deb-btn-container { flex: 1 1 45%; }
+        }
     </style>
 
     <div class="card mb-4 border-0 shadow-sm" style="background: #007bff; color: white; border-radius: 15px;">
         <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h3 class="mb-0 font-weight-bold">Debonair Training AI Dashboard</h3>
-                <div class="license-badges">
-                    <span class="badge badge-pill badge-light text-primary py-2 px-3 mr-1" style="opacity: 0.8;">Freemium</span>
-                    <span class="badge badge-pill badge-light text-primary py-2 px-3 mr-1">Premium Mode</span>
-                    <span class="badge badge-pill badge-warning py-2 px-3 font-weight-bold">Enterprise Mode</span>
+                <div class="d-none d-md-block">
+                    <span class="deb-badge badge-light text-primary">Freemium</span>
+                    <span class="deb-badge badge-light text-primary mx-1">Premium Mode</span>
+                    <span class="deb-badge badge-warning text-dark font-weight-bold">Enterprise Mode</span>
                 </div>
             </div>
-            <div class="btn-grid">
+            <div class="deb-flex-grid">
                 {{#buttons}}
-                <a href="{{{url}}}" class="btn btn-sm {{#active}}active-btn{{/active}}{{^active}}btn-light{{/active}} shadow-sm">{{label}}</a>
+                <div class="deb-btn-container">
+                    <a href="{{{url}}}" class="btn btn-sm btn-block btn-light {{active_class}}" style="height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                        {{label}}
+                    </a>
+                </div>
                 {{/buttons}}
             </div>
         </div>
     </div>
 
-    <div class="alert alert-white border-left border-danger shadow-sm d-flex justify-content-between align-items-center mb-4 bg-white">
-        <span class="text-danger font-weight-bold">{{ai_hero_text}}</span>
-        <button class="btn btn-success font-weight-bold shadow-sm">Engage Recovery Plan</button>
+    <div class="alert alert-white border-left border-danger shadow-sm d-flex justify-content-between align-items-center mb-4 bg-white" style="border-left-width: 6px !important; border-radius: 10px;">
+        <span class="text-danger font-weight-bold"><i class="fa fa-robot mr-2"></i>{{ai_hero_text}}</span>
+        <a href="{{{recovery_url}}}" target="_blank" class="btn btn-success btn-sm font-weight-bold px-4 shadow-sm" style="border-radius: 20px;">
+            Engage Recovery Plan
+        </a>
     </div>
 
-    <div class="flight-deck-main-grid">
-        <div class="main-content-area">
-            <div class="card shadow-sm border-0 p-3 h-100 chart-area" style="min-height: 550px;">
+    <div class="deb-main-content-row">
+        <div class="deb-chart-main">
+            <div class="card shadow-sm border-0 p-3" style="min-height: 520px; border-radius: 15px;">
                 <div class="d-flex justify-content-end mb-2">
                     <div class="btn-group btn-group-sm">
                         <a href="{{{bar_url}}}" class="btn btn-outline-secondary {{#is_bar}}active{{/is_bar}}">Bar</a>
@@ -52,42 +84,26 @@
                         <a href="{{{pie_url}}}" class="btn btn-outline-secondary {{#is_pie}}active{{/is_pie}}">Pie</a>
                     </div>
                 </div>
-                {{{main_chart}}}
+                <div class="chart-container" style="position: relative; width: 100%;">
+                    {{{main_chart}}}
+                </div>
             </div>
         </div>
-        
-        <div class="sidebar-content-area">
+
+        <div class="deb-sidebar-history">
             {{#history_blocks}}
-            <div class="card shadow-sm border-0 p-2 mb-3" style="min-height: 250px;">
-                <h6 class="text-dark text-center small font-weight-bold mb-1">{{title}}</h6>
-                <p class="text-muted text-center mb-1" style="font-size: 0.7rem;">{{description}}</p>
-                <div style="height: 180px; width: 100%;">{{{content}}}</div>
+            <div class="card shadow-sm border-0 p-2 mb-3" style="border-radius: 12px; border: 1px solid #eee;">
+                <h6 class="text-dark text-center small font-weight-bold mb-1 border-bottom pb-1" style="opacity: 0.8;">{{title}}</h6>
+                <div style="height: 180px; width: 100%;">
+                    {{{content}}}
+                </div>
+            </div>
+            {{/history_blocks}}
+            {{^history_blocks}}
+            <div class="card shadow-sm border-0 p-4 text-center text-muted small" style="border-radius: 12px;">
+                <p class="mb-0">Navigate charts to build history.</p>
             </div>
             {{/history_blocks}}
         </div>
     </div>
-
-    <footer class="mt-4 p-4 text-white shadow-lg" style="background: #007bff; border-radius: 15px;">
-        <div class="container-fluid">
-            <div class="row align-items-start">
-                <div class="col-md-7 border-right border-white-50">
-                    <h4 class="font-weight-bold">Debonair Training Ltd</h4>
-                    <p class="small pr-4">Our mission is to harness digital learning technology and 21st century pedagogical strategies to deliver measurable excellence.</p>
-                    <p class="small mb-0">© 2002 – 2026 Debonair Training Ltd</p>
-                </div>
-                <div class="col-md-5 pl-md-5">
-                    <div class="d-flex mb-3">
-                        <a href="#" class="text-white mr-3"><i class="fa fa-facebook-square fa-lg"></i></a>
-                        <a href="#" class="text-white mr-3"><i class="fa fa-twitter-square fa-lg"></i></a>
-                        <a href="#" class="text-white mr-3"><i class="fa fa-linkedin-square fa-lg"></i></a>
-                    </div>
-                    <h6 class="font-weight-bold text-uppercase mb-2">Contact</h6>
-                    <ul class="list-unstyled small">
-                        <li><i class="fa fa-globe mr-2"></i> www.debonairtraining.com</li>
-                        <li><i class="fa fa-envelope mr-2"></i> info@debonairtraining.com</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </footer>
 </div>
