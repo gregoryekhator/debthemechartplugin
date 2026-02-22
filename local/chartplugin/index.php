@@ -1,34 +1,59 @@
 <?php
 /**
- * Path: /var/www/html/moodle_test/local/chartplugin/index.php
- * Re-assembly: Stable Phase
+ * Path: /local/chartplugin/index.php
  */
 require_once(__DIR__ . '/../../config.php');
-
-$type = optional_param('type', 'synopsis', PARAM_ALPHANUM);
-$render = optional_param('render', 'bar', PARAM_ALPHANUM);
-
 require_login();
+
+$type = optional_param('type', 'synopsis', PARAM_ALPHANUMEXT);
+$render = optional_param('render', '', PARAM_ALPHANUM);
+
 $context = context_system::instance();
 $PAGE->set_context($context);
-$PAGE->set_url(new moodle_url('/local/chartplugin/index.php'), ['type' => $type, 'render' => $render]);
+$PAGE->set_url(new moodle_url('/local/chartplugin/index.php'), ['type' => $type]);
 $PAGE->set_title("AI Analytics Dashboard");
+$PAGE->set_pagelayout('report');
 
-// 1. Log view
-\local_chartplugin\analytics\synopsis::save_view_history($USER->id, $type, $render);
+$class = '\local_chartplugin\analytics\synopsis';
 
-// 2. Get Data
-$template_data = \local_chartplugin\analytics\synopsis::get_template_data($USER->id, $type, $render);
+if (!class_exists($class)) {
+    echo $OUTPUT->header();
+    echo $OUTPUT->notification("Updating UI...", "notifysuccess");
+    echo $OUTPUT->footer();
+    exit;
+}
+
+$defs = $class::get_button_definitions();
+if (empty($render)) {
+    $render = $defs[$type]['default_render'] ?? 'bar';
+}
+
+$class::save_view_history($USER->id, $type, $render);
+
+$buttons = [];
+foreach ($defs as $key => $opt) {
+    $buttons[] = [
+        'label' => $opt['label'],
+        'url' => new moodle_url($PAGE->url, ['type' => $key, 'render' => $opt['default_render']]),
+        'active_class' => ($type == $key ? 'deb-active-now' : '')
+    ];
+}
+
+$template_data = [
+    'ai_hero_text' => $class::get_ai_performance_delta($USER->id),
+    'current_chart_label' => $defs[$type]['label'] ?? 'Analytics',
+    'main_chart' => $OUTPUT->render($class::build_dynamic_chart($type, false, $render)),
+    'history_blocks' => $class::get_history_blocks($USER->id),
+    'buttons' => $buttons,
+    'recovery_url' => (new moodle_url('/admin/tool/lp/plans.php', ['userid' => $USER->id]))->out(false),
+    'is_bar'  => ($render === 'bar'),
+    'is_line' => ($render === 'line'),
+    'is_pie'  => ($render === 'pie'),
+    'bar_url'  => new moodle_url($PAGE->url, ['type' => $type, 'render' => 'bar']),
+    'line_url' => new moodle_url($PAGE->url, ['type' => $type, 'render' => 'line']),
+    'pie_url'  => new moodle_url($PAGE->url, ['type' => $type, 'render' => 'pie']),
+];
 
 echo $OUTPUT->header();
-
-$template_data['current_chart_label'] = \local_chartplugin\analytics\synopsis::get_button_definitions()[$type]['label'] ?? 'Analytics';
-
-$render_vars = array_merge($template_data, [
-    'main_chart' => $OUTPUT->render(\local_chartplugin\analytics\synopsis::build_dynamic_chart($type, false, $render)),
-    'history_blocks' => \local_chartplugin\analytics\synopsis::get_history_blocks($USER->id),
-    'recovery_url' => (new moodle_url('/admin/tool/lp/plans.php', ['userid' => $USER->id]))->out(false)
-]);
-
-echo $OUTPUT->render_from_template('local_chartplugin/analytics_page', $render_vars);
+echo $OUTPUT->render_from_template('local_chartplugin/analytics_page', $template_data);
 echo $OUTPUT->footer();

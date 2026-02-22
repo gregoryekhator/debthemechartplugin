@@ -1,64 +1,36 @@
 <div id="deb-dashboard-root" class="container-fluid p-0">
     <style>
-        /* CORE STABILITY */
-        #deb-dashboard-root { 
-            overflow: hidden; 
-            width: 100%; 
-        }
-
-        /* BUTTON GRID */
-        .deb-flex-grid { display: flex; flex-wrap: wrap; margin: -5px; }
-        .deb-btn-container { flex: 1 1 23%; padding: 5px; min-width: 150px; }
+        /* Q693: Typography Force - Target the SVG rendered by Moodle */
+        .deb-chart-main h5 { font-size: 15pt !important; font-weight: bold !important; color: #333; }
+        .chart-container svg text { font-family: 'Arial', sans-serif !important; }
         
-        /* THE TIDY LAYOUT: Fluid Flex */
-        .deb-main-content-row { 
-            display: flex; 
-            flex-direction: row; 
-            gap: 20px; 
-            margin-top: 20px;
+        /* Apply sizes to SVG Chart elements */
+        .chart-container .chart-title { font-size: 15pt !important; }
+        .chart-container .chart-legend text { font-size: 12pt !important; }
+
+        /* iPad Pro Button Grid Fix: Force 4 per row (25%) instead of wrapping early */
+        @media (min-width: 992px) {
+            .deb-btn-container { flex: 0 0 24% !important; max-width: 24%; }
         }
 
-        .deb-chart-main { 
-            flex: 3; /* Takes 75% of space fluently */
-            min-width: 0; 
-        }
+        #deb-dashboard-root { overflow: hidden; width: 100%; }
+        .deb-flex-grid { display: flex; flex-wrap: wrap; margin: -5px; justify-content: start; }
+        .deb-btn-container { padding: 5px; min-width: 140px; }
+        
+        .deb-main-content-row { display: flex; flex-direction: row; gap: 20px; margin-top: 20px; }
+        .deb-chart-main { flex: 3; min-width: 0; }
+        .deb-sidebar-history { flex: 1; min-width: 260px; }
 
-        .deb-sidebar-history { 
-            flex: 1; /* Takes 25% of space fluently */
-            min-width: 260px;
-        }
-
-        /* HIGHLIGHTS & BADGES */
-        .deb-active-now { 
-            background-color: #001f3f !important; 
-            color: #ffffff !important; 
-            border: 2px solid #ffffff !important; 
-            font-weight: bold !important; 
-        }
-        .deb-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
-
-        /* IPAD PRO / TABLET REFINEMENT */
-        @media (max-width: 1200px) { 
-            .deb-main-content-row { flex-direction: column; } 
-            .deb-sidebar-history { width: 100%; }
-            .deb-btn-container { flex: 1 1 45%; }
-        }
+        .deb-active-now { background-color: #001f3f !important; color: #ffffff !important; border: 2px solid #ffffff !important; }
     </style>
 
     <div class="card mb-4 border-0 shadow-sm" style="background: #007bff; color: white; border-radius: 15px;">
         <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="mb-0 font-weight-bold">Debonair Training AI Dashboard</h3>
-                <div class="d-none d-md-block">
-                    <span class="deb-badge badge-light text-primary">Freemium</span>
-                    <span class="deb-badge badge-light text-primary mx-1">Premium Mode</span>
-                    <span class="deb-badge badge-warning text-dark font-weight-bold">Enterprise Mode</span>
-                </div>
-            </div>
+            <h3 class="mb-3 font-weight-bold">Debonair Training AI Dashboard</h3>
             <div class="deb-flex-grid">
                 {{#buttons}}
                 <div class="deb-btn-container">
-                    <a href="{{{url}}}" class="btn btn-sm btn-block btn-light {{active_class}}" style="height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                    <a href="{{{url}}}" class="btn btn-sm btn-block btn-light {{active_class}}" style="height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.85rem;">
                         {{label}}
                     </a>
                 </div>
@@ -77,6 +49,7 @@
     <div class="deb-main-content-row">
         <div class="deb-chart-main">
             <div class="card shadow-sm border-0 p-3" style="min-height: 520px; border-radius: 15px;">
+                <h5 class="mb-3">{{current_chart_label}}</h5>
                 <div class="d-flex justify-content-end mb-2">
                     <div class="btn-group btn-group-sm">
                         <a href="{{{bar_url}}}" class="btn btn-outline-secondary {{#is_bar}}active{{/is_bar}}">Bar</a>
@@ -92,16 +65,11 @@
 
         <div class="deb-sidebar-history">
             {{#history_blocks}}
-            <div class="card shadow-sm border-0 p-2 mb-3" style="border-radius: 12px; border: 1px solid #eee;">
-                <h6 class="text-dark text-center small font-weight-bold mb-1 border-bottom pb-1" style="opacity: 0.8;">{{title}}</h6>
+            <div class="card shadow-sm border-0 p-2 mb-3" style="border-radius: 12px; border: 1px solid #eee; height: 260px; overflow: hidden;">
+                <h6 class="text-dark text-center small font-weight-bold mb-1 border-bottom pb-1">{{title}}</h6>
                 <div style="height: 180px; width: 100%;">
                     {{{content}}}
                 </div>
-            </div>
-            {{/history_blocks}}
-            {{^history_blocks}}
-            <div class="card shadow-sm border-0 p-4 text-center text-muted small" style="border-radius: 12px;">
-                <p class="mb-0">Navigate charts to build history.</p>
             </div>
             {{/history_blocks}}
         </div>
