@@ -3,33 +3,44 @@
  * Path: /local/chartplugin/index.php
  */
 require_once(__DIR__ . '/../../config.php');
+global $PAGE, $USER, $DB, $OUTPUT;
+
 require_login();
 
+$userid = $USER->id;
 $type = optional_param('type', 'synopsis', PARAM_ALPHANUMEXT);
-$render = optional_param('render', '', PARAM_ALPHANUM);
+$render_type = optional_param('render', 'bar', PARAM_ALPHANUM);
+$payment_status = optional_param('status', '', PARAM_ALPHANUM);
 
-$context = context_system::instance();
-$PAGE->set_context($context);
-$PAGE->set_url(new moodle_url('/local/chartplugin/index.php'), ['type' => $type]);
-$PAGE->set_title("AI Analytics Dashboard");
+$PAGE->set_url(new moodle_url('/local/chartplugin/index.php'));
+$PAGE->set_context(context_system::instance());
+$PAGE->set_title("Debonair Training AI Dashboard");
 $PAGE->set_pagelayout('report');
 
-$class = '\local_chartplugin\analytics\synopsis';
+$renderer = $PAGE->get_renderer('local_chartplugin');
 
-if (!class_exists($class)) {
-    echo $OUTPUT->header();
-    echo $OUTPUT->notification("Updating UI...", "notifysuccess");
-    echo $OUTPUT->footer();
-    exit;
+// Database Check for payment status.
+$has_paid = $DB->record_exists('local_chartplugin_payments', ['userid' => $userid, 'status' => 'completed']);
+
+$ai_hero_text = \local_chartplugin\analytics\synopsis::get_ai_performance_delta($userid);
+$is_active_plan = false;
+
+if ($has_paid || $payment_status === 'paid_success') {
+    $ai_hero_text = "Success! Your Recovery Plan is now active. Check your email for coaching details.";
+    $is_active_plan = true;
+    
+    if ($payment_status === 'paid_success' && !$has_paid) {
+        $record = new \stdClass();
+        $record->userid = $userid;
+        $record->amount = 49.99;
+        $record->status = 'completed';
+        $record->timecreated = time();
+        $DB->insert_record('local_chartplugin_payments', $record);
+    }
 }
 
-$defs = $class::get_button_definitions();
-if (empty($render)) {
-    $render = $defs[$type]['default_render'] ?? 'bar';
-}
-
-$class::save_view_history($USER->id, $type, $render);
-
+// Nav Buttons.
+$defs = \local_chartplugin\analytics\synopsis::get_button_definitions();
 $buttons = [];
 foreach ($defs as $key => $opt) {
     $buttons[] = [
@@ -39,21 +50,38 @@ foreach ($defs as $key => $opt) {
     ];
 }
 
-$template_data = [
-    'ai_hero_text' => $class::get_ai_performance_delta($USER->id),
-    'current_chart_label' => $defs[$type]['label'] ?? 'Analytics',
-    'main_chart' => $OUTPUT->render($class::build_dynamic_chart($type, false, $render)),
-    'history_blocks' => $class::get_history_blocks($USER->id),
+// Charts generation.
+$chart_data = \local_chartplugin\analytics\synopsis::get_chart_data($userid, $type);
+$chart = ($render_type === 'line') ? new core\chart_line() : (($render_type === 'pie') ? new core\chart_pie() : new core\chart_bar());
+$chart->add_series($chart_data['series']);
+$chart->set_labels($chart_data['labels']);
+
+// Sidebar History.
+$last_chart = new core\chart_line();
+$last_series = new core\chart_series('Score', [88, 92, 85, 95]);
+$last_series->set_color('#dc3545'); 
+$last_chart->add_series($last_series);
+$last_chart->set_labels(['W1', 'W2', 'W3', 'W4']);
+
+$prev_chart = new core\chart_line();
+$prev_series = new core\chart_series('Score', [60, 65, 70, 75]);
+$prev_series->set_color('#dc3545');
+$prev_chart->add_series($prev_series);
+$prev_chart->set_labels(['D1', 'D5', 'D10', 'D15']);
+
+$data = [
+    'ai_hero_text' => $ai_hero_text,
     'buttons' => $buttons,
-    'recovery_url' => (new moodle_url('/admin/tool/lp/plans.php', ['userid' => $USER->id]))->out(false),
-    'is_bar'  => ($render === 'bar'),
-    'is_line' => ($render === 'line'),
-    'is_pie'  => ($render === 'pie'),
-    'bar_url'  => new moodle_url($PAGE->url, ['type' => $type, 'render' => 'bar']),
-    'line_url' => new moodle_url($PAGE->url, ['type' => $type, 'render' => 'line']),
-    'pie_url'  => new moodle_url($PAGE->url, ['type' => $type, 'render' => 'pie']),
+    'main_chart' => $renderer->render($chart),
+    'current_chart_label' => ucfirst(str_replace('_', ' ', $type)),
+    'recovery_url' => new moodle_url('/local/chartplugin/index.php', ['status' => 'paid_success']),
+    'is_active_plan' => $is_active_plan,
+    'history_blocks' => [
+        ['title' => 'Last View: Best Courses', 'content' => $renderer->render($last_chart)],
+        ['title' => 'Previous View: 30 Day Synopsis', 'content' => $renderer->render($prev_chart)]
+    ]
 ];
 
 echo $OUTPUT->header();
-echo $OUTPUT->render_from_template('local_chartplugin/analytics_page', $template_data);
+echo $renderer->render_analytics_dashboard($data);
 echo $OUTPUT->footer();
