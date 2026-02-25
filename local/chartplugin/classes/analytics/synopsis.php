@@ -25,14 +25,14 @@ class synopsis {
 
     public static function get_button_definitions() {
         return [
-            'synopsis' => ['label' => 'Synopsis (to date)', 'default_render' => 'bar', 'tooltip' => 'ML Analysis: Tracks weekly grade velocity to predict end-of-term outcomes.'],
-            'best' => ['label' => 'Best Courses', 'label_short' => 'Best', 'default_render' => 'bar', 'tooltip' => 'ML Analysis: Identifies courses where your engagement-to-grade ratio is highest.'],
-            'cohort' => ['label' => 'Cohort Performance', 'default_render' => 'bar', 'tooltip' => 'ML Analysis: Uses K-Means clustering to group you with similar performing peers.'],
-            'best_plan' => ['label' => 'Best Learning Plan', 'default_render' => 'pie', 'tooltip' => 'ML Analysis: Recommends the Learning Plan with the highest historical completion rate.'],
-            'synopsis_30' => ['label' => '30 Day Synopsis', 'default_render' => 'line', 'tooltip' => 'ML Analysis: Linear regression model forecasting next week predicted score.'],
-            'lowest_courses' => ['label' => 'Lowest Courses', 'default_render' => 'bar', 'tooltip' => 'ML Analysis: Flags courses where Time-on-Task is significantly below average.'],
-            'frequency' => ['label' => 'Study Frequency', 'default_render' => 'line', 'tooltip' => 'ML Analysis: Pattern recognition of study habits (Cramming vs Consistent).'],
-            'style' => ['label' => 'Preferred Learning Style', 'default_render' => 'bar', 'tooltip' => 'ML Analysis: Random Forest Classifier predicting your optimal content format.']
+            'synopsis' => ['label' => 'Synopsis (to date)', 'default_render' => 'bar', 'tooltip' => 'Weekly grade velocity.'],
+            'best' => ['label' => 'Best Courses', 'default_render' => 'bar', 'tooltip' => 'Highest engagement ratios.'],
+            'cohort' => ['label' => 'Cohort Performance', 'default_render' => 'bar', 'tooltip' => 'Peer clustering comparison.'],
+            'best_plan' => ['label' => 'Best Learning Plan', 'default_render' => 'pie', 'tooltip' => 'Completion rate plans.'],
+            'synopsis_30' => ['label' => '30 Day Synopsis', 'default_render' => 'line', 'tooltip' => 'Regression forecasting.'],
+            'lowest_courses' => ['label' => 'Lowest Courses', 'default_render' => 'bar', 'tooltip' => 'Low Time-on-Task flags.'],
+            'frequency' => ['label' => 'Study Frequency', 'default_render' => 'line', 'tooltip' => 'Pattern recognition habits.'],
+            'style' => ['label' => 'Preferred Learning Style', 'default_render' => 'bar', 'tooltip' => 'Predicted content format.']
         ];
     }
 }
