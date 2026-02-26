@@ -1,65 +1,80 @@
-/* 1. Global Page Structure for Report Layout */
-#page-local-chartplugin-index #region-main {
+/* 1. Global Page Structure - Forced Report Layout Stability */
+#page-local-chartplugin-index #region-main,
+#deb-dashboard-container {
     width: 100% !important;
     max-width: 100% !important;
-    padding: 0 15px !important;
+    padding: 0 !important;
+    margin: 0 !important;
     background-color: #f8f9fc !important;
 }
 
 /* 2. Blue Hero Header */
-.dashboard-header-container {
-    background-color: #007bff !important; /* Solid blue as requested */
-    border-radius: 12px;
+.deb-blue-header {
+    background: #007bff !important;
+    color: white !important;
+    border-radius: 0 0 25px 25px !important;
+    padding: 1.5rem;
     box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    margin-bottom: 20px;
 }
 
-/* 3. Button Grid - 4 per row fixed */
-.button-column {
-    flex: 0 0 24% !important;
-    max-width: 24% !important;
-    padding: 6px;
-    box-sizing: border-box;
-}
-
-.button-column .btn {
+/* 3. Button Grid */
+.deb-nav-btn {
+    background: #ffffff !important;
+    color: #007bff !important;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none !important;
+    transition: all 0.2s ease-in-out;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-weight: 600;
-    font-size: 0.85rem;
-    border-radius: 6px;
-    transition: all 0.2s ease;
+    display: block;
 }
 
-.btn-light {
-    background-color: #ffffff !important;
-    color: #007bff !important;
-    border: none !important;
-}
-
-.btn-dark {
-    background-color: #1c2938 !important;
+.deb-active-now {
+    background-color: #002d5a !important;
     color: #ffffff !important;
-    border: 1.5px solid #ffffff !important;
+    border: 2px solid #ffc107 !important;
+    transform: scale(1.02);
 }
 
-/* 4. Main/Sidebar Flex Alignment */
-.gold-v2-container .row.flex-nowrap {
+/* 4. Main/Sidebar Flex (75/25 Split) */
+.deb-main-content-row {
     display: flex !important;
-    margin: 0 -10px;
+    flex-wrap: nowrap !important;
+    margin: 0 !important;
 }
 
-.gold-v2-container .col-md-9 {
+.deb-chart-col {
     flex: 0 0 75% !important;
     max-width: 75% !important;
+    padding-right: 15px;
 }
 
-.gold-v2-container .col-md-3 {
+.deb-sidebar-col {
     flex: 0 0 25% !important;
     max-width: 25% !important;
 }
 
-/* 5. Insight Box Polish */
-.border-left-primary {
-    border-left: 0.25rem solid #007bff !important;
+/* 5. UI Polish */
+.deb-ai-hero {
+    border-left: 6px solid #dc3545 !important;
+    border-radius: 12px;
+    background: white;
+}
+
+.deb-chart-card, .deb-sidebar-card {
+    border-radius: 15px;
+    background: #fff;
+    border: none;
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+}
+
+.deb-footer {
+    background: #007bff !important;
+    color: white !important;
+    border-radius: 25px 25px 0 0;
+    margin-top: 50px;
 }
