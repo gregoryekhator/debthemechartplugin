@@ -297,8 +297,7 @@ class growth_renderer extends plugin_renderer_base {
     protected function get_sql(string $field, string $table, string $wh, array $params = [], bool $weeks = true) {
         global $DB;
         $family = $DB->get_dbfamily();
-        switch ($family) {
-            case 'mysql':
+A            case 'mysql':
                 $func = $weeks ? 'WEEKOFYEAR' : 'QUARTER';
                 $concat = "CONCAT(YEAR(FROM_UNIXTIME($field)), ' ', $func(FROM_UNIXTIME($field)))";
                 $sql = "SELECT $concat AS week, COUNT(*) AS newitems FROM {" . $table . "}

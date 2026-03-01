@@ -33,3 +33,12 @@ function theme_debtheme_get_footer_context() {
         'year' => date('Y'),
     ];
 }
+
+/**
+ * Serves as the handshake for Moodle 4.x navigation nodes.
+ */
+function theme_debtheme_before_standard_html_head() {
+    global $PAGE;
+    // Force Moodle to acknowledge we want the secondary nav nodes
+    $PAGE->set_secondary_navigation(true);
+}

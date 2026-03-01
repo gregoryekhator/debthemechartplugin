@@ -1,31 +1,33 @@
-// Header & Grid Styling
-.debtheme-header {
-    background: linear-gradient(135deg, #0056b3, #003d80); // Blue Banner
-    padding: 30px;
-    border-radius: 15px;
-    margin-bottom: 25px;
-
-    .debtheme-header-buttons {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 15px;
+/* Secondary Nav Styling (Fixes Site Admin Tabs) */
+.secondary-navigation {
+    background: #ffffff;
+    border-bottom: 1px solid #dee2e6;
+    .nav-tabs {
+        border-bottom: none;
+        .nav-link.active {
+            border-bottom: 3px solid #007bff;
+        }
     }
 }
 
-// Button Style: White BG, Blue Text
-.header-btn {
-    background: #ffffff !important;
-    color: #0056b3 !important;
-    padding: 12px 5px !important;
-    border-radius: 8px !important;
-    font-weight: 700 !important;
-    text-align: center;
-    border: 1px solid rgba(0,0,0,0.1) !important;
-    text-decoration: none !important;
-    font-size: 0.85rem !important;
-
-    &:hover {
-        background: #f1f1f1 !important;
-        text-decoration: none !important;
+/* Flight Deck Grid (4x2) */
+.debtheme-header {
+    background: #007bff !important;
+    padding: 40px !important;
+    border-radius: 20px !important;
+    .deb-grid-container {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 15px !important;
     }
+}
+
+/* FOOTER STABILITY: Restoring Blue BG */
+#page-footer, .debtheme-footer {
+    display: block !important;
+    background: #007bff !important; 
+    color: #ffffff !important;
+    padding: 40px 30px !important;
+    border-radius: 25px 25px 0 0 !important;
+    margin-top: 50px !important;
 }

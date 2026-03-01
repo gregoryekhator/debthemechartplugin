@@ -1,19 +1,10 @@
 <div class="debtheme-header">
-
-    <h1 class="debtheme-header-title">
-        {{#str}}debonair_title, theme_debtheme{{/str}}
-    </h1>
-
-    <div class="debtheme-header-buttons">
-        <button id="synopsis_btn" class="header-btn">{{#str}}synopsis_date, theme_debtheme{{/str}}</button>
-        <button id="best_courses_btn" class="header-btn">{{#str}}best_courses, theme_debtheme{{/str}}</button>
-        <button id="cohort_perf_btn" class="header-btn">{{#str}}cohort_performance, theme_debtheme{{/str}}</button>
-        <button id="best_learning_btn" class="header-btn wide">{{#str}}best_learning_plan, theme_debtheme{{/str}}</button>
-
-        <button id="30day_synopsis_btn" class="header-btn">{{#str}}synopsis_30, theme_debtheme{{/str}}</button>
-        <button id="lowest_courses_btn" class="header-btn">{{#str}}worst_courses, theme_debtheme{{/str}}</button>
-        <button id="study_freq_btn" class="header-btn">{{#str}}study_frequency, theme_debtheme{{/str}}</button>
-        <button id="pref_learning_btn" class="header-btn wide">{{#str}}preferred_learning_style, theme_debtheme{{/str}}</button>
+    <h1 class="text-white mb-4">Welcome to Debonair Learning</h1>
+    <div class="deb-grid-container">
+        {{#buttons}}
+            <a href="{{url}}" class="btn header-btn {{#active}}deb-active-now{{/active}}">
+                {{text}}
+            </a>
+        {{/buttons}}
     </div>
-
 </div>

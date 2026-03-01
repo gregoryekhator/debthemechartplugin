@@ -1,128 +1,65 @@
 /* ==========================================================================
-   DEBONAIR THEME - MASTER OVERRIDE (custom.css)
+   DEBONAIR THEME - ARCHITECTURAL SYNC (custom.css)
    ========================================================================== */
 
-/* 1. LAYOUT & CONTAINER ALIGNMENT
-   -------------------------------------------------------------------------- */
-.debtheme-main-container {
-    max-width: 1140px !important;
-    margin: 0 auto !important;
-    padding-left: 15px !important;
-    padding-right: 15px !important;
+/* 1. Page Background & Container Sync */
+body#page-local-chartplugin-index,
+.debtheme-container {
+    background-color: #f8f9fc !important;
 }
 
-/* Precision Kill for Moodle's default "Dotted" or "Dashed" regions */
-#region-main, 
-#region-side-pre, 
-[data-region="blocks-column"], 
-.block-region, 
-.columnleft, 
-.columnright {
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-}
-
-/* 2. HEADER DASHBOARD
-   -------------------------------------------------------------------------- */
-#page-wrapper .debtheme-header {
-    background: #0d6efd !important;
+/* 2. Unified Blue Header (Syncing Theme & Plugin) */
+#page-wrapper .debtheme-header,
+.deb-blue-header {
+    background: #007bff !important;
     color: #ffffff !important;
     padding: 40px 30px !important;
-    border-radius: 15px !important;
-    text-align: center !important;
+    border-radius: 0 0 25px 25px !important;
     margin-bottom: 30px !important;
     border: none !important;
+    text-align: center !important;
 }
 
-.debtheme-header-title {
-    font-size: 2.2rem !important;
-    font-weight: 700 !important;
-    margin-bottom: 25px !important;
-    color: #ffffff !important;
-}
-
-.debtheme-header-buttons {
+/* 3. Button Grid Hardening (4 per row) */
+.debtheme-header-buttons,
+.deb-button-grid {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
     gap: 15px !important;
 }
 
-.header-btn {
-    background: #ffffff !important;
-    color: #0d6efd !important;
-    padding: 14px 10px !important;
-    border-radius: 8px !important;
-    font-weight: 700 !important;
-    text-align: center !important;
-    text-decoration: none !important;
-    font-size: 0.9rem !important;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease !important;
-    border: 1px solid rgba(0,0,0,0.05) !important;
+/* 4. The 75/25 "Anti-Bulge" Split */
+#page-local-chartplugin-index #region-main {
+    flex: 0 0 75% !important;
+    max-width: 75% !important;
+    padding-right: 20px !important;
 }
 
-.header-btn:hover {
-    background: #f8f9fa !important;
-    transform: translateY(-3px) !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-    text-decoration: none !important;
+#page-local-chartplugin-index aside[data-region="blocks-column"] {
+    flex: 0 0 25% !important;
+    max-width: 25% !important;
 }
 
-/* 3. FOOTER - THE "HEAVY DUTY" BLUE RESTORATION
-   -------------------------------------------------------------------------- */
-/* We use the body and page-wrapper prefix to ensure this selector is the strongest */
+/* 5. Footer "Heavy Duty" Restore */
 body #page-wrapper footer#page-footer.debtheme-footer {
-    background-color: #0d6efd !important;
-    background: #0d6efd !important; 
+    background: #007bff !important;
     color: #ffffff !important;
-    border-radius: 15px !important;
-    overflow: hidden !important;
-    border: none !important;
+    border-radius: 25px 25px 0 0 !important;
     margin-top: 3rem !important;
-    padding: 0 !important;
-    display: block !important;
+    padding: 20px !important;
 }
 
-/* Force text visibility for all footer elements */
-#page-footer.debtheme-footer h5, 
-#page-footer.debtheme-footer h6, 
-#page-footer.debtheme-footer p, 
-#page-footer.debtheme-footer span,
-#page-footer.debtheme-footer i {
-    color: #ffffff !important;
+/* Using the ID from your DevTools screenshot (image_45787d.png) */
+#page-wrapper .debtheme-header,
+body#page-site-index .debtheme-header,
+.debtheme-header {
+    background-color: #007bff !important; 
+    background: #007bff !important;
 }
 
-/* Social Strip Background */
-#page-footer .footer-social-strip {
-    background-color: rgba(0, 0, 0, 0.15) !important;
-    width: 100% !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Main Footer Content Area */
-#page-footer .footer-main-content {
-    background: transparent !important;
-    padding: 40px 30px !important;
-}
-
-/* Copyright Bar at bottom */
-#page-footer .footer-copyright {
-    background-color: rgba(0, 0, 0, 0.25) !important;
-    padding: 15px 0 !important;
-    font-size: 0.85rem !important;
-}
-
-/* 4. ANALYTICS INJECTION BOX (Phase 2B)
-   -------------------------------------------------------------------------- */
-.analytics-injection-wrapper {
-    margin-bottom: 30px !important;
-    animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Force footer color */
+footer#page-footer.debtheme-footer,
+#page-wrapper .debtheme-footer {
+    background-color: #007bff !important;
+    background: #007bff !important;
 }
