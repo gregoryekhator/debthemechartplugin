@@ -1,78 +1,91 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * A two column layout for the boost theme.
+ *
+ * @package   theme_boost
+ * @copyright 2016 Damyon Wiese
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
-global $OUTPUT, $PAGE;
+// --- FORCE THE HANDSHAKE FOR MOODLE 4.4 ---
+global $PAGE;
+$PAGE->set_secondary_navigation(true);
+// ------------------------------------------
 
-$deb_renderer = $PAGE->get_renderer('theme_debtheme');
+require_once($CFG->libdir . '/behat/lib.php');
+require_once($CFG->libdir . '/behat/lib.php');
 
-// 1. REPLICATING BOOST PRIMARY NAV
-$primarynav = $PAGE->primarynav;
-$p_menu = new \core\navigation\output\more_menu($primarynav, 'nav-tabs');
-$p_menudata = $p_menu->export_for_template($OUTPUT);
+// Add block button in editing mode.
+$addblockbutton = $OUTPUT->addblockbutton();
 
-// 2. REPLICATING BOOST SECONDARY NAV (Fixes Site Admin)
-$secondarynav = $PAGE->secondarynav;
-$s_menudata = null;
-if ($secondarynav && $secondarynav->has_children()) {
-    $s_menu = new \core\navigation\output\more_menu($secondarynav, 'nav-tabs');
-    $s_menudata = $s_menu->export_for_template($OUTPUT);
+$extraclasses = [];
+$bodyattributes = $OUTPUT->body_attributes($extraclasses);
+$blockshtml = $OUTPUT->blocks('side-pre');
+$hasblocks = (strpos($blockshtml, 'data-block=') !== false || !empty($addblockbutton));
+
+// Force the population of navigation nodes for Moodle 4.4/4.5
+$PAGE->set_secondary_navigation(true);
+
+$secondarynavigation = false;
+$overflow = '';
+
+// Check if we have actual data to show
+if ($PAGE->has_secondary_navigation()) {
+    $tablistnav = $PAGE->has_tablist_secondary_navigation();
+    // We pass the secondarynav object to the More Menu output
+    $moremenu = new \core\navigation\output\more_menu($PAGE->secondarynav, 'nav-tabs', true, $tablistnav);
+    $secondarynavigation = $moremenu->export_for_template($OUTPUT);
+    
+    // This ensures the Site Admin vertical list becomes horizontal tabs
+    $overflowdata = $PAGE->secondarynav->get_overflow_menu_data();
+    if (!is_null($overflowdata)) {
+        $overflow = $overflowdata->export_for_template($OUTPUT);
+    }
 }
 
-echo $OUTPUT->doctype();
-?>
-<html <?php echo $OUTPUT->htmlattributes(); ?>>
-<head>
-    <title><?php echo $PAGE->title; ?></title>
-    <?php echo $OUTPUT->standard_head_html(); ?>
-</head>
-<body id="<?php echo $PAGE->bodyid; ?>" class="<?php echo $PAGE->bodyclasses; ?>">
-<?php echo $OUTPUT->standard_top_of_body_html(); ?>
+$primary = new core\navigation\output\primary($PAGE);
+$renderer = $PAGE->get_renderer('core');
+$primarymenu = $primary->export_for_template($renderer);
+$buildregionmainsettings = !$PAGE->include_region_main_settings_in_header_actions()  && !$PAGE->has_secondary_navigation();
+// If the settings menu will be included in the header then don't add it here.
+$regionmainsettingsmenu = $buildregionmainsettings ? $OUTPUT->region_main_settings_menu() : false;
 
-<div id="page-wrapper" class="d-flex flex-column">
+$header = $PAGE->activityheader;
+$headercontent = $header->export_for_template($renderer);
 
-    <nav class="fixed-top navbar navbar-light bg-white navbar-expand border-bottom px-3" id="main-nav">
-        <div class="container-fluid">
-            <div class="primary-navigation mr-auto">
-                <?php echo $OUTPUT->render_from_template('core/moremenu', $p_menudata); ?>
-            </div>
-            <div class="ml-auto d-flex align-items-center">
-                <?php echo $OUTPUT->user_menu(); ?>
-            </div>
-        </div>
-    </nav>
+$templatecontext = [
+    'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
+    'output' => $OUTPUT,
+    'sidepreblocks' => $blockshtml,
+    'hasblocks' => $hasblocks,
+    'bodyattributes' => $bodyattributes,
+    'primarymoremenu' => $primarymenu['moremenu'],
+    'secondarymoremenu' => $secondarynavigation ?: false,
+    'mobileprimarynav' => $primarymenu['mobileprimarynav'],
+    'usermenu' => $primarymenu['user'],
+    'langmenu' => $primarymenu['lang'],
+    'regionmainsettingsmenu' => $regionmainsettingsmenu,
+    'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
+    'headercontent' => $headercontent,
+    'overflow' => $overflow,
+    'addblockbutton' => $addblockbutton,
+];
 
-    <div id="page" class="container-fluid drawer-page-content" style="margin-top: 80px;">
-        
-        <?php if ($s_menudata): ?>
-            <div class="secondary-navigation d-print-none mb-3">
-                <?php echo $OUTPUT->render_from_template('core/moremenu', $s_menudata); ?>
-            </div>
-        <?php endif; ?>
-
-        <div class="row mb-4">
-            <div class="col-12">
-                <?php echo $deb_renderer->render_from_template('theme_debtheme/custom_header', $deb_renderer->get_flight_deck_context()); ?>
-            </div>
-        </div>
-
-        <div id="page-content" class="row">
-            <div id="region-main-box" class="col-12">
-                <section id="region-main" data-region="main" aria-label="<?php echo get_string('content'); ?>">
-                    <?php echo $OUTPUT->main_content(); ?>
-                </section>
-            </div>
-        </div>
-    </div>
-
-    <div id="nav-drawer" class="d-none" aria-hidden="true" data-region="drawer">
-        <div class="drawer-content"></div>
-    </div>
-
-    <footer id="page-footer">
-        <?php echo $deb_renderer->render_from_template('theme_debtheme/custom_footer', theme_debtheme_get_footer_context()); ?>
-    </footer>
-</div>
-
-<?php echo $OUTPUT->standard_end_of_body_html(); ?>
-</body>
-</html>
+echo $OUTPUT->render_from_template('theme_boost/columns2', $templatecontext);
