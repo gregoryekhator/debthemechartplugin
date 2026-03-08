@@ -1,19 +1,23 @@
-<div class="debtheme-header">
+<div class="deb-nav-grid">
+    <a href="index.php?type=synopsis" class="nav-btn {{#type_synopsis}}active-tab{{/type_synopsis}}">Synopsis (to date)</a>
+    <a href="index.php?type=best" class="nav-btn {{#type_best}}active-tab{{/type_best}}">Best Courses</a>
+    
+    <a href="index.php?type=cohort" class="nav-btn {{^is_premium}}locked-btn{{/is_premium}} {{#type_cohort}}active-tab{{/type_cohort}}">
+        Cohort Performance {{^is_premium}}🔒{{/is_premium}}
+    </a>
+    
+    <a href="index.php?type=best_plan" class="nav-btn {{^is_enterprise}}locked-btn{{/is_enterprise}} {{#type_plan}}active-tab{{/type_plan}}">
+        Best Learning Plan {{^is_enterprise}}🔒{{/is_enterprise}}
+    </a>
 
-    <h1 class="debtheme-header-title">
-        {{#str}}debonair_title, theme_debtheme{{/str}}
-    </h1>
-
-    <div class="debtheme-header-buttons">
-        <button id="synopsis_btn" class="header-btn">{{#str}}synopsis_date, theme_debtheme{{/str}}</button>
-        <button id="best_courses_btn" class="header-btn">{{#str}}best_courses, theme_debtheme{{/str}}</button>
-        <button id="cohort_perf_btn" class="header-btn">{{#str}}cohort_performance, theme_debtheme{{/str}}</button>
-        <button id="best_learning_btn" class="header-btn wide">{{#str}}best_learning_plan, theme_debtheme{{/str}}</button>
-
-        <button id="30day_synopsis_btn" class="header-btn">{{#str}}synopsis_30, theme_debtheme{{/str}}</button>
-        <button id="lowest_courses_btn" class="header-btn">{{#str}}worst_courses, theme_debtheme{{/str}}</button>
-        <button id="study_freq_btn" class="header-btn">{{#str}}study_frequency, theme_debtheme{{/str}}</button>
-        <button id="pref_learning_btn" class="header-btn wide">{{#str}}preferred_learning_style, theme_debtheme{{/str}}</button>
-    </div>
-
+    <a href="index.php?type=synopsis_30" class="nav-btn {{#type_synopsis_30}}active-tab{{/type_synopsis_30}}">30-Day Synopsis</a>
+    <a href="index.php?type=lowest_courses" class="nav-btn {{#type_lowest}}active-tab{{/type_lowest}}">Lowest Courses</a>
+    
+    <a href="index.php?type=frequency" class="nav-btn {{^is_premium}}locked-btn{{/is_premium}} {{#type_frequency}}active-tab{{/type_frequency}}">
+        Study Frequency {{^is_premium}}🔒{{/is_premium}}
+    </a>
+    
+    <a href="index.php?type=style" class="nav-btn {{^is_enterprise}}locked-btn{{/is_enterprise}} {{#type_style}}active-tab{{/type_style}}">
+        Preferred Style {{^is_enterprise}}🔒{{/is_enterprise}}
+    </a>
 </div>
