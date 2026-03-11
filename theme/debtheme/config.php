@@ -15,56 +15,49 @@ $THEME->yuicssmodules = [];
 $THEME->csspostprocess = 'theme_debtheme_css_postprocess';
 
 $THEME->layouts = [
-    // Default fallback layout.
     'default' => [
         'file' => 'columns2.php',
-        'regions' => ['side-pre', 'side-post'],
+        'regions' => ['side-pre'],
         'defaultregion' => 'side-pre',
     ],
-
-    // Front page (site root)
+    // Moodle 4.x Dashboard primary layout
+    'drawers' => [
+        'file' => 'columns2.php',
+        'regions' => ['side-pre'],
+        'defaultregion' => 'side-pre',
+    ],
     'frontpage' => [
         'file' => 'columns2.php',
-        'regions' => ['side-pre', 'side-post'],
+        'regions' => ['side-pre'],
         'defaultregion' => 'side-pre',
     ],
-
-    // Dashboard
     'mydashboard' => [
         'file' => 'columns2.php',
-        'regions' => ['side-pre', 'side-post'],
+        'regions' => ['side-pre'],
         'defaultregion' => 'side-pre',
     ],
-
-    // My courses page
     'mypublic' => [
         'file' => 'columns2.php',
-        'regions' => ['side-pre', 'side-post'],
+        'regions' => ['side-pre'],
         'defaultregion' => 'side-pre',
     ],
-
-    // Course pages
     'course' => [
         'file' => 'columns2.php',
-        'regions' => ['side-pre', 'side-post'],
+        'regions' => ['side-pre'],
         'defaultregion' => 'side-pre',
     ],
-
-    // Admin pages
     'admin' => [
         'file' => 'columns2.php',
-        'regions' => ['side-pre', 'side-post'],
+        'regions' => ['side-pre'],
         'defaultregion' => 'side-pre',
     ],
-
-    // Miscellaneous pages (optional, catches edge cases)
-    'popup' => [
+    'report' => [
         'file' => 'columns2.php',
-        'regions' => [],
+        'regions' => ['side-pre'],
+        'defaultregion' => 'side-pre',
     ],
     'login' => [
         'file' => 'columns2.php',
         'regions' => [],
     ],
 ];
-

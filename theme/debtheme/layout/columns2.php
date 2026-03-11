@@ -1,35 +1,36 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
-global $CFG, $OUTPUT, $PAGE, $USER;
 
+global $CFG, $OUTPUT, $PAGE;
+
+// 1. ENSURE VARIABLES ARE ALWAYS DEFINED (Fixes the crash in Image 2)
+$user_level = 'freemium'; // This will eventually come from your DB
+$user_level_label = strtoupper($user_level);
 $currenttype = optional_param('type', 'synopsis', PARAM_TEXT);
-$user_level = 'freemium'; // Change for testing
 
-$is_premium = ($user_level === 'premium' || $user_level === 'enterprise');
-$is_enterprise = ($user_level === 'enterprise');
+// 2. PRE-PROCESS NAV (Same as before)
+$raw_items = [
+    ['id' => 'synopsis', 'name' => 'Synopsis (to date)', 'req' => 'free'],
+    ['id' => 'best', 'name' => 'Best Courses', 'req' => 'free'],
+    ['id' => 'cohort', 'name' => 'Cohort Performance', 'req' => 'premium'],
+    ['id' => 'best_plan', 'name' => 'Best Learning Plan', 'req' => 'enterprise'],
+    ['id' => 'synopsis_30', 'name' => '30-Day Synopsis', 'req' => 'free'],
+    ['id' => 'lowest_courses', 'name' => 'Lowest Courses', 'req' => 'free'],
+    ['id' => 'frequency', 'name' => 'Study Frequency', 'req' => 'premium'],
+    ['id' => 'style', 'name' => 'Preferred Style', 'req' => 'enterprise'],
+];
 
-$is_locked = false;
-$required_level = "";
-if (($currenttype === 'cohort' || $currenttype === 'frequency') && !$is_premium) {
-    $is_locked = true;
-    $required_level = "Premium";
-} else if (($currenttype === 'best_plan' || $currenttype === 'style') && !$is_enterprise) {
-    $is_locked = true;
-    $required_level = "Enterprise";
+$processed_nav = [];
+foreach ($raw_items as $item) {
+    $lock = ($item['req'] !== 'free' && $user_level === 'freemium') ? ' 🔒' : '';
+    $processed_nav[] = [
+        'url' => $CFG->wwwroot . '/local/chartplugin/index.php?type=' . $item['id'],
+        'display_name' => $item['name'] . $lock,
+        'is_active' => ($currenttype === $item['id'])
+    ];
 }
 
-$template_context = [
-    'is_premium' => $is_premium,
-    'is_enterprise' => $is_enterprise,
-    'type_synopsis' => ($currenttype === 'synopsis'),
-    'type_best' => ($currenttype === 'best'),
-    'type_cohort' => ($currenttype === 'cohort'),
-    'type_plan' => ($currenttype === 'best_plan'),
-    'type_synopsis_30' => ($currenttype === 'synopsis_30'),
-    'type_lowest' => ($currenttype === 'lowest_courses'),
-    'type_frequency' => ($currenttype === 'frequency'),
-    'type_style' => ($currenttype === 'style'),
-];
+$template_context = ['nav_links' => $processed_nav];
 
 echo $OUTPUT->doctype();
 ?>
@@ -37,83 +38,45 @@ echo $OUTPUT->doctype();
 <head>
     <title><?php echo $PAGE->title; ?></title>
     <?php echo $OUTPUT->standard_head_html(); ?>
-    <style>
-        body { background-color: #f4f7f6 !important; padding-top: 60px; } /* Space for fixed nav */
-        #page-header { display: none !important; }
-        
-        /* Dashboard Wrapper */
-        .dashboard-outer-wrapper { margin: 0 5% 50px 5%; }
-        .deb-header-rect { background-color: #007bff !important; border-radius: 20px 20px 0 0; padding: 40px; color: white; position: relative; }
-        .deb-nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 20px; }
-        
-        /* Content Grid */
-        .deb-content-rect { background-color: white; padding: 30px; display: grid; grid-template-columns: 74% 24%; gap: 2%; border: 1px solid #dee2e6; border-top: none; position: relative; min-height: 600px; }
-        
-        /* The Shield */
-        .restricted-shield {
-            position: absolute; top: 0; left: 0; width: 75%; height: 100%; z-index: 50;
-            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px;
-        }
-
-        /* Buttons & Nav */
-        .nav-btn { background-color: white !important; color: #007bff !important; border-radius: 8px; font-weight: bold; text-align: center; padding: 12px; text-decoration: none !important; display: block; }
-        .nav-btn.active-tab { background-color: #004085 !important; color: white !important; }
-        .locked-btn { opacity: 0.6; background-color: #e9ecef !important; }
-    </style>
 </head>
+
 <body <?php echo $OUTPUT->body_attributes(); ?>>
 <?php echo $OUTPUT->standard_top_of_body_html(); ?>
 
-<nav class="fixed-top navbar navbar-light bg-white navbar-expand moodle-has-zindex" aria-label="<?php echo get_string('sitenavigation') ?>">
-    <div class="container-fluid">
-        <button class="navbar-toggler aabtn" type="button" data-toggle="collapse" data-target="#navbar-controls" aria-controls="navbar-controls" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="navbar-brand d-flex align-items-center">
-            <img src="<?php echo $OUTPUT->get_logo_url(); ?>" alt="Logo" style="height: 35px;">
-        </div>
-        <div id="navbar-controls" class="collapse navbar-collapse">
-            <?php echo $OUTPUT->custom_menu(); ?>
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item d-flex align-items-center">
-                    <?php echo $OUTPUT->user_menu(); ?>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<div id="page-wrapper">
+    <nav class="navbar navbar-light bg-white border-bottom px-5 py-2 mb-3">
+        <img src="<?php echo $OUTPUT->get_logo_url(); ?>" style="height: 30px;">
+        <div class="ml-auto"><?php echo $OUTPUT->user_menu(); ?></div>
+    </nav>
 
-<div class="dashboard-outer-wrapper">
-    <div class="deb-header-rect">
-        <h1 class="h2 font-weight-bold">Debonair Training A.I. Dashboard</h1>
-        <?php echo $OUTPUT->render_from_template('theme_debtheme/custom_header', $template_context); ?>
-    </div>
+    <div id="page" class="container-fluid px-5">
+        <div id="page-header" class="d-none"><?php echo $OUTPUT->full_header(); ?></div>
 
-    <div class="deb-content-rect <?php echo $is_locked ? 'is-locked-view' : ''; ?>">
-        <?php if ($is_locked): ?>
-        <div class="restricted-shield">
-            <i class="fa fa-lock fa-5x text-muted mb-4"></i>
-            <h2 class="text-dark">Access Restricted</h2>
-            <p class="lead text-muted">The <strong><?php echo s($currenttype); ?></strong> insight is available on the <strong><?php echo s($required_level); ?> Plan</strong>.</p>
-            <button class="btn btn-primary btn-lg mt-3" onclick="alert('Redirecting...')">Upgrade Dashboard</button>
+        <div class="deb-banner" style="background: #007bff; color: white; border-radius: 20px 20px 0 0; padding: 40px; position: relative;">
+            <span style="position: absolute; top: 20px; right: 40px; background: white; color: #007bff; padding: 5px 15px; border-radius: 20px; font-weight: bold;">
+                <?php echo $user_level_label; ?>
+            </span>
+            <h1 class="h2 font-weight-bold">Debonair Training A.I. Dashboard</h1>
+            <?php echo $OUTPUT->render_from_template('theme_debtheme/custom_header', $template_context); ?>
         </div>
-        <?php endif; ?>
 
-        <main id="region-main" style="<?php echo $is_locked ? 'filter: blur(4px); pointer-events: none;' : ''; ?>">
-            <div id="main-content-placeholder">
+        <div id="page-content" class="row bg-white border border-top-0 m-0 p-4" data-region="main">
+            <section id="region-main" class="col-md-9">
                 <?php echo $OUTPUT->main_content(); ?>
-            </div>
-        </main>
+            </section>
 
-        <aside id="block-region-side-pre">
-            <div class="card shadow-sm border-0 p-3" style="background: #f8f9fa;">
-                <h5 class="text-primary font-weight-bold">Tier Insights</h5>
-                <p class="small text-muted">You are currently on the <strong><?php echo strtoupper($user_level); ?></strong> tier.</p>
-                <hr>
+            <aside id="block-region-side-pre" class="col-md-3 block-region" data-blockregion="side-pre">
                 <?php echo $OUTPUT->blocks('side-pre'); ?>
+            </aside>
+        </div>
+
+        <footer class="footer-rect" style="background: #007bff; color: white; padding: 40px; border-radius: 0 0 20px 20px; margin-bottom: 40px;">
+            <div class="row">
+                <div class="col-md-6"><strong>Debonair Training Ltd</strong></div>
+                <div class="col-md-6 text-right">© 2002 - 2026</div>
             </div>
-        </aside>
+            <div class="d-none"><?php echo $OUTPUT->standard_footer_html(); ?></div>
+        </footer>
     </div>
 </div>
 
