@@ -1,66 +1,45 @@
 <?php
 /**
  * Path: /local/chartplugin/index.php
+ * Day 7: Stable Beauty Restoration - Merging Feb Architecture with Sprint 3 Logic
  */
 require_once(__DIR__ . '/../../config.php');
-global $PAGE, $USER, $DB, $OUTPUT, $SESSION;
+require_once(__DIR__ . '/lib.php');
+global $PAGE, $USER, $OUTPUT, $SESSION;
 
 require_login();
 
-// 1. Parameters
+// 1. Setup Parameters
 $type = optional_param('type', 'synopsis', PARAM_ALPHANUMEXT);
-$render_type = optional_param('render', '', PARAM_ALPHANUM);
-$safemode = optional_param('safemode', 0, PARAM_INT); // Safe Mode Switch
+$format = optional_param('format', 'bar', PARAM_ALPHANUMEXT);
 
-// 2. Moodle Page Setup (Initialization Block)
+// 2. Moodle Page Setup (The "Island" Configuration)
 $PAGE->set_url(new moodle_url('/local/chartplugin/index.php', ['type' => $type]));
 $PAGE->set_context(context_system::instance());
-$PAGE->set_title("Debonair Training AI Dashboard");
-$PAGE->set_pagelayout('report'); // Technical Debt: Standardizing to report layout
+$PAGE->set_pagelayout('report'); // The February Secret Sauce
 $renderer = $PAGE->get_renderer('local_chartplugin');
 
-// 3. Emergency Safe Mode Bypass
-if ($safemode) {
-    echo $OUTPUT->header();
-    $data = [
-        'ai_hero_text' => 'SAFE MODE ACTIVE: Chart rendering bypassed for stability.',
-        'user_level' => 'DEBUG',
-        'is_safemode' => true,
-        'main_chart' => '<div class="alert alert-warning">Charts are currently disabled in Safe Mode to prevent render loops.</div>'
-    ];
-    echo $OUTPUT->render_from_template('local_chartplugin/analytics_page', $data);
-    echo $OUTPUT->footer();
-    exit;
-}
-
-// 4. History Rotation Logic (SESSION-based)
+// 3. History Rotation (Sprint 3 Logic)
 if (!isset($SESSION->deb_history)) { $SESSION->deb_history = []; }
 if (empty($SESSION->deb_history) || $SESSION->deb_history[0] !== $type) {
     array_unshift($SESSION->deb_history, $type);
     $SESSION->deb_history = array_slice($SESSION->deb_history, 0, 3);
 }
 
-// 5. Load Definitions & Determine Render Mode
+// 4. Data Loading
 $defs = \local_chartplugin\analytics\synopsis::get_button_definitions();
 $current_def = $defs[$type] ?? $defs['synopsis'];
-$selected_render = $render_type ?: $current_def['default_render'];
-
-// 6. Build Main Chart
 $chart_data = \local_chartplugin\analytics\synopsis::get_chart_data($USER->id, $type);
-if ($selected_render === 'line') {
-    $chart = new core\chart_line();
-} else if ($selected_render === 'pie') {
-    $chart = new core\chart_pie();
-} else {
-    $chart = new core\chart_bar();
-}
+
+// 5. Main Chart Construction
+$chart_class = "\\core\\chart_" . $format;
+$chart = class_exists($chart_class) ? new $chart_class() : new \core\chart_bar();
 $chart->add_series($chart_data['series']);
 $chart->set_labels($chart_data['labels']);
 
-// 7. Sidebar History Logic (Associative Learning)
+// 6. Associative History Blocks (Sprint 3 Logic)
 $history_blocks = [];
-$h_labels = [1 => 'Last View', 2 => 'Previous View'];
-foreach ($h_labels as $idx => $label) {
+foreach ([1, 2] as $idx) {
     $h_type = $SESSION->deb_history[$idx] ?? null;
     if ($h_type && isset($defs[$h_type])) {
         $h_def = $defs[$h_type];
@@ -69,37 +48,52 @@ foreach ($h_labels as $idx => $label) {
         $h_chart->add_series($h_data['series']);
         $h_chart->set_labels($h_data['labels']);
         
-        $associative_prefix = ($idx == 2) ? "To boost your learning capacity; this comparison greatly boosts your associative learning skills. " : "";
-
         $history_blocks[] = [
-            'title' => strtoupper($label) . ': ' . $h_def['label'],
-            'subtitle' => $associative_prefix . $h_def['tooltip'],
+            'title' => ($idx == 1 ? "LAST VIEW: " : "PREVIOUS: ") . $h_def['label'],
+            'subtitle' => ($idx == 2 ? "Associative learning boost: " : "") . $h_def['tooltip'],
             'content' => $renderer->render($h_chart)
         ];
     }
 }
 
-// 8. Assemble Template Data
+$nav_items = [];
+    foreach ($defs as $key => $details) {
+        // Determine if the item should be locked (Logic from image 2ab763.png)
+        $is_locked = ($key === 'best_plan' || $key === 'style') && empty($SESSION->is_enterprise_user);
+        
+        $nav_items[] = [
+            'name'   => $details['label'],
+             'url'    => $is_locked ? '#' : new moodle_url('/local/chartplugin/index.php', ['type' => $key]),
+            'active' => ($type === $key),
+            'locked' => $is_locked
+        ];
+    }
+
+// 7. Data Assembly for Template (February Naming + Sprint 3 Data)
 $data = [
-    'user_level' => 'ENTERPRISE', 
+    'user_level' => !empty($SESSION->is_enterprise_user) ? 'ENTERPRISE' : 'FREEMIUM',
     'ai_hero_text' => \local_chartplugin\analytics\synopsis::get_ai_performance_delta($USER->id),
     'main_chart' => $renderer->render($chart),
     'chart_title' => $current_def['label'],
+    'nav_items'     => $nav_items, // Matches the new template loop
     'chart_subtitle' => $current_def['tooltip'],
     'history_blocks' => $history_blocks,
-    'current_type' => $type,
-    'is_bar' => ($selected_render == 'bar'),
-    'is_line' => ($selected_render == 'line'),
-    'is_pie' => ($selected_render == 'pie'),
+    'brandorganization_footer' => 'Debonair Training Limited',
+    'brandwebsite_footer' => 'www.debonairtraining.com',
+    'brandemail_footer' => 'info@debonairtraining.com',
+    'brandphone_footer' => '+44 (0) 20 7946 0000',
+    'year' => date('Y'),
     'buttons' => array_map(function($k, $v) use ($type) {
         return [
             'label' => $v['label'], 
             'url' => new moodle_url('/local/chartplugin/index.php', ['type' => $k]), 
-            'active_class' => ($k == $type ? 'deb-active-now' : 'deb-inactive')
+            'active_class' => ($k == $type ? 'deb-active-now' : 'btn-light')
         ];
     }, array_keys($defs), $defs)
 ];
 
 echo $OUTPUT->header();
-echo $OUTPUT->render_from_template('local_chartplugin/analytics_page', $data);
+echo $renderer->render_from_template('local_chartplugin/custom_header', $data);
+echo $renderer->render_from_template('local_chartplugin/analytics_page', $data);
+echo $renderer->render_from_template('local_chartplugin/custom_footer', $data);
 echo $OUTPUT->footer();

@@ -1,0 +1,29 @@
+<div class="deb-banner text-white p-4 mx-5 mt-4" style="background-color: #007bff; border-radius: 20px 20px 0 0; position: relative;">
+
+    <div class="deb-subscription-badges d-flex align-items-center" style="position: absolute; top: 20px; right: 20px; gap: 12px;">
+        <span class="badge badge-pill" style="background-color: #ff8c00; color: white; padding: 6px 16px; font-weight: 800; border: 2px solid white;">FREEMIUM</span>
+        
+        <div class="status-pill-active" title="Status: Active" style="width: 35px; height: 18px; border-radius: 10px; background-color: #28a745; border: 2px solid white; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 6px; height: 6px; background: white; border-radius: 50%;"></div>
+        </div>
+
+        <span class="badge badge-pill" style="background-color: {{#is_enterprise}}#28a745{{/is_enterprise}}{{^is_enterprise}}rgba(255,255,255,0.3){{/is_enterprise}}; color: white; padding: 6px 16px; font-weight: 800; border: 2px solid white; opacity: {{#is_enterprise}}1{{/is_enterprise}}{{^is_enterprise}}0.6{{/is_enterprise}};">ENTERPRISE</span>
+    </div>
+
+    <h1 class="h2 font-weight-bold mb-4">Dashboard Analytics</h1>
+    
+    {{! The 4-column Grid for Navigation }}
+    <div class="deb-grid-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+        {{#nav_items}}
+            <a href="{{url}}" class="deb-nav-btn {{#active}}active{{/active}} {{#locked}}locked{{/locked}}" 
+               style="background: #ffffff; color: #007bff; padding: 12px 5px; border-radius: 8px; text-align: center; font-weight: 700; text-decoration: none; position: relative; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 55px;">
+                {{name}}
+                
+                {{#locked}}
+                    <i class="fa fa-lock" style="position: absolute; top: 5px; right: 8px; color: #ff8c00; background: white; border-radius: 50%; padding: 2px; font-size: 0.8rem;"></i>
+                    <span style="font-size: 0.6rem; color: #6c757d; font-weight: 600; margin-top: 2px;">UPGRADE</span>
+                {{/locked}}
+            </a>
+        {{/nav_items}}
+    </div>
+</div>

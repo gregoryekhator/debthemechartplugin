@@ -18,19 +18,22 @@
     margin-bottom: 20px;
 }
 
-/* 3. Button Grid */
-.deb-nav-btn {
-    background: #ffffff !important;
-    color: #007bff !important;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.85rem;
-    border: none !important;
-    transition: all 0.2s ease-in-out;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
+/* Sprint 3 Active Navigation Button Style */
+.deb-nav-btn.active {
+    background-color: #e7f1ff !important; /* Light blue tint for active */
+    color: #0056b3 !important;
+    border: 2px solid #0056b3 !important;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.deb-nav-btn.locked {
+    opacity: 0.85;
+    cursor: not-allowed;
+}
+
+.deb-nav-btn:hover:not(.locked) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .deb-active-now {
@@ -77,4 +80,60 @@
     color: white !important;
     border-radius: 25px 25px 0 0;
     margin-top: 50px;
+}
+
+FOOTER - THE "HEAVY DUTY" BLUE RESTORATION
+   -------------------------------------------------------------------------- */
+/* We use the body and page-wrapper prefix to ensure this selector is the strongest */
+body #page-wrapper footer#page-footer.debtheme-footer {
+    background-color: #0d6efd !important;
+    background: #0d6efd !important; 
+    color: #ffffff !important;
+    border-radius: 15px !important;
+    overflow: hidden !important;
+    border: none !important;
+    margin-top: 3rem !important;
+    padding: 0 !important;
+    display: block !important;
+}
+
+/* Force text visibility for all footer elements */
+#page-footer.debtheme-footer h5, 
+#page-footer.debtheme-footer h6, 
+#page-footer.debtheme-footer p, 
+#page-footer.debtheme-footer span,
+#page-footer.debtheme-footer i {
+    color: #ffffff !important;
+}
+
+/* Social Strip Background */
+#page-footer .footer-social-strip {
+    background-color: rgba(0, 0, 0, 0.15) !important;
+    width: 100% !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Main Footer Content Area */
+#page-footer .footer-main-content {
+    background: transparent !important;
+    padding: 40px 30px !important;
+}
+
+/* Copyright Bar at bottom */
+#page-footer .footer-copyright {
+    background-color: rgba(0, 0, 0, 0.25) !important;
+    padding: 15px 0 !important;
+    font-size: 0.85rem !important;
+}
+
+/* 4. ANALYTICS INJECTION BOX (Phase 2B)
+   -------------------------------------------------------------------------- */
+.analytics-injection-wrapper {
+    margin-bottom: 30px !important;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
