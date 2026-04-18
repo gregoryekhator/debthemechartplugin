@@ -1,7 +1,6 @@
 <?php
 /**
  * Path: /local/chartplugin/index.php
- * Day 7: Stable Beauty Restoration - Merging Feb Architecture with Sprint 3 Logic
  */
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
@@ -9,87 +8,96 @@ global $PAGE, $USER, $OUTPUT, $SESSION;
 
 require_login();
 
-// 1. Setup Parameters
 $type = optional_param('type', 'synopsis', PARAM_ALPHANUMEXT);
 $format = optional_param('format', 'bar', PARAM_ALPHANUMEXT);
 
-// 2. Moodle Page Setup (The "Island" Configuration)
-$PAGE->set_url(new moodle_url('/local/chartplugin/index.php', ['type' => $type]));
-$PAGE->set_context(context_system::instance());
-$PAGE->set_pagelayout('report'); // The February Secret Sauce
-$renderer = $PAGE->get_renderer('local_chartplugin');
+// 1. GLOBAL STATUS CHECK
+$idnumber = $USER->idnumber ?? '';
+$is_enterprise = (strpos($idnumber, 'ENT-') === 0);
+$is_trial = (strpos($idnumber, 'TRIAL-') === 0);
+$has_access = ($is_enterprise || $is_trial);
 
-// 3. History Rotation (Sprint 3 Logic)
-if (!isset($SESSION->deb_history)) { $SESSION->deb_history = []; }
-if (empty($SESSION->deb_history) || $SESSION->deb_history[0] !== $type) {
-    array_unshift($SESSION->deb_history, $type);
-    $SESSION->deb_history = array_slice($SESSION->deb_history, 0, 3);
+$trial_expiry = 0;
+if ($is_trial) {
+    $trial_expiry = (int)str_replace('TRIAL-', '', $idnumber);
 }
 
-// 4. Data Loading
-$defs = \local_chartplugin\analytics\synopsis::get_button_definitions();
-$current_def = $defs[$type] ?? $defs['synopsis'];
-$chart_data = \local_chartplugin\analytics\synopsis::get_chart_data($USER->id, $type);
+$PAGE->set_url(new moodle_url('/local/chartplugin/index.php', ['type' => $type, 'format' => $format]));
+$PAGE->set_context(context_system::instance());
+$PAGE->set_pagelayout('report');
 
-// 5. Main Chart Construction
+$renderer = $PAGE->get_renderer('local_chartplugin');
+$defs = \local_chartplugin\analytics\synopsis::get_button_definitions();
+
+// 2. Navigation & Locking Logic
+$nav_items = [];
+foreach ($defs as $key => $def) {
+    $is_locked = (!$has_access && ($key === 'learning_plan' || $key === 'style_insights'));
+    $nav_items[] = [
+        'name' => $def['label'],
+        'url'  => new moodle_url('/local/chartplugin/index.php', ['type' => $key, 'format' => $format]),
+        'active' => ($type === $key),
+        'locked' => $is_locked,
+        'show_upgrade_pill' => $is_locked
+    ];
+}
+
+// 3. AI Descriptions
+$descriptions = [
+    'synopsis' => "Your overall performance since sign-up. Keep pushing to exceed the cohort average!",
+    'monthly' => "Your performance over the last month vs the class performance.",
+    'best_courses' => "Your best courses by scores vs the class performance. Leverage these strengths!",
+    'lowest_courses' => "Your lowest courses. The best recovery plan through gap analysis starts here.",
+    'grade_dist' => "Grade distribution curve in your cohort. Mouse over for more information to improve.",
+    'work_rate' => "This is your work rate relative to your class.",
+    'learning_plan' => "Performance on your current competency plan. Meet the template standard to level up.",
+    'style_insights' => "Your learning style based on EdTech insights. Turn up the dial on your sensory strengths!"
+];
+
+// 4. Main Chart
+$chart_data = \local_chartplugin\analytics\synopsis::get_chart_data($USER->id, $type);
+$chart_data['title'] = $defs[$type]['label']; 
+local_chartplugin_save_history($chart_data);
+
 $chart_class = "\\core\\chart_" . $format;
 $chart = class_exists($chart_class) ? new $chart_class() : new \core\chart_bar();
 $chart->add_series($chart_data['series']);
 $chart->set_labels($chart_data['labels']);
+$chart->get_yaxis(0, true)->set_min(0);
 
-// 6. Associative History Blocks (Sprint 3 Logic)
-$history_blocks = [];
-foreach ([1, 2] as $idx) {
-    $h_type = $SESSION->deb_history[$idx] ?? null;
-    if ($h_type && isset($defs[$h_type])) {
-        $h_def = $defs[$h_type];
-        $h_data = \local_chartplugin\analytics\synopsis::get_chart_data($USER->id, $h_type);
-        $h_chart = new core\chart_line(); 
-        $h_chart->add_series($h_data['series']);
-        $h_chart->set_labels($h_data['labels']);
-        
-        $history_blocks[] = [
-            'title' => ($idx == 1 ? "LAST VIEW: " : "PREVIOUS: ") . $h_def['label'],
-            'subtitle' => ($idx == 2 ? "Associative learning boost: " : "") . $h_def['tooltip'],
-            'content' => $renderer->render($h_chart)
-        ];
-    }
+// 5. Cockpit History (Last and Previous)
+$last_viewed = null;
+if (!empty($SESSION->chart_history[1])) {
+    $h = $SESSION->chart_history[1];
+    $c = new core\chart_line(); $c->add_series($h['series']); $c->set_labels($h['labels']);
+    $c->get_yaxis(0, true)->set_min(0);
+    $last_viewed = (object)['html' => $renderer->render($c), 'title' => $h['title']];
 }
 
-$nav_items = [];
-    foreach ($defs as $key => $details) {
-        // Determine if the item should be locked (Logic from image 2ab763.png)
-        $is_locked = ($key === 'best_plan' || $key === 'style') && empty($SESSION->is_enterprise_user);
-        
-        $nav_items[] = [
-            'name'   => $details['label'],
-             'url'    => $is_locked ? '#' : new moodle_url('/local/chartplugin/index.php', ['type' => $key]),
-            'active' => ($type === $key),
-            'locked' => $is_locked
-        ];
-    }
+$prev_viewed = null;
+if (!empty($SESSION->chart_history[2])) {
+    $h = $SESSION->chart_history[2];
+    $c = new core\chart_line(); $c->add_series($h['series']); $c->set_labels($h['labels']);
+    $c->get_yaxis(0, true)->set_min(0);
+    $prev_viewed = (object)['html' => $renderer->render($c), 'title' => $h['title']];
+}
 
-// 7. Data Assembly for Template (February Naming + Sprint 3 Data)
 $data = [
-    'user_level' => !empty($SESSION->is_enterprise_user) ? 'ENTERPRISE' : 'FREEMIUM',
-    'ai_hero_text' => \local_chartplugin\analytics\synopsis::get_ai_performance_delta($USER->id),
-    'main_chart' => $renderer->render($chart),
-    'chart_title' => $current_def['label'],
-    'nav_items'     => $nav_items, // Matches the new template loop
-    'chart_subtitle' => $current_def['tooltip'],
-    'history_blocks' => $history_blocks,
-    'brandorganization_footer' => 'Debonair Training Limited',
-    'brandwebsite_footer' => 'www.debonairtraining.com',
-    'brandemail_footer' => 'info@debonairtraining.com',
-    'brandphone_footer' => '+44 (0) 20 7946 0000',
-    'year' => date('Y'),
-    'buttons' => array_map(function($k, $v) use ($type) {
-        return [
-            'label' => $v['label'], 
-            'url' => new moodle_url('/local/chartplugin/index.php', ['type' => $k]), 
-            'active_class' => ($k == $type ? 'deb-active-now' : 'btn-light')
-        ];
-    }, array_keys($defs), $defs)
+    'is_enterprise' => $is_enterprise,
+    'is_trial' => $is_trial,
+    'is_freemium' => !$has_access,
+    'has_access' => $has_access,
+    'trial_expiry_timestamp' => $trial_expiry,
+    'nav_items' => $nav_items,
+    'chart_title' => $defs[$type]['label'],
+    'chart_tooltip' => $descriptions[$type] ?? "Analyze metrics to boost associative learning.",
+    'main_chart_html' => $renderer->render($chart),
+    'last_viewed' => $last_viewed,
+    'prev_viewed' => $prev_viewed,
+    'current_type' => $type,
+    'is_bar' => ($format === 'bar'),
+    'is_line' => ($format === 'line'),
+    'current_year' => date('Y')
 ];
 
 echo $OUTPUT->header();

@@ -36,7 +36,7 @@ class synopsis {
         'synopsis_30'    => ['label' => '30 Day Synopsis', 'default_render' => 'line', 'tooltip' => "Your performance over the last month vs the class performance."],
         'lowest_courses' => ['label' => 'Lowest Courses', 'default_render' => 'bar', 'tooltip' => "The best recovery plan through gap analysis and tips."],
         'frequency'      => ['label' => 'Study Frequency', 'default_render' => 'bar', 'tooltip' => "This is your work rate relative to your class."],
-        'style'          => ['label' => 'Learning Style', 'default_render' => 'pie', 'tooltip' => "Focus on your strength: Visual, Audio, Reflective or Kinesthetic."]
+        'style'          => ['label' => 'Cognitive Pattern', 'default_render' => 'pie', 'tooltip' => "Focus on your strength: Visual, Audio, Reflective or Kinesthetic."]
     ];
 }
 }

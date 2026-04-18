@@ -107,3 +107,22 @@ function local_chartplugin_get_grade_distribution($courseid) {
 function local_chartplugin_get_report_filename($userid) {
     return "Flight_Log_User_" . $userid . "_" . date('Y-m-d') . ".pdf";
 }
+
+/**
+ * Saves current chart data into the Moodle Session to drive the Cockpit UI.
+ */
+function local_chartplugin_save_history($data) {
+    global $SESSION;
+    if (!isset($SESSION->chart_history)) {
+        $SESSION->chart_history = [];
+    }
+    // Don't save if it's the same as the last one
+    if (!empty($SESSION->chart_history) && $SESSION->chart_history[0] === $data) {
+        return;
+    }
+    array_unshift($SESSION->chart_history, $data);
+    // Keep only the last 3 views
+    if (count($SESSION->chart_history) > 3) {
+        array_pop($SESSION->chart_history);
+    }
+}

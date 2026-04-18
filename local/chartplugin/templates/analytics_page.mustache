@@ -1,58 +1,63 @@
-<div class="mx-5 p-4 bg-white border-left border-right shadow-sm">
-    {{! AI Hero Section }}
-    <div class="alert alert-white border-left border-danger shadow-sm d-flex justify-content-between align-items-center mb-4 px-4 py-3" style="border-left-width: 6px !important; border-radius: 10px;">
-        <div class="d-flex align-items-center">
-            <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center mr-3" style="width: 40px; height: 40px;">
-                <i class="fa fa-bolt"></i>
-            </div>
-            <div>
-                <div class="small text-muted font-weight-bold">AI PERFORMANCE INSIGHT</div>
-                <div class="font-weight-bold text-dark">{{{ai_hero_text}}}</div>
-            </div>
+<div class="chartplugin-content mx-5">
+    <div class="alert bg-white shadow-sm d-flex justify-content-between align-items-center my-4 p-3" 
+         style="border-left: 6px solid #ff002d; border-radius: 15px;">
+        <div class="h6 mb-0 font-weight-bold text-dark">
+            <i class="fa fa-robot mr-2 text-primary"></i>AI Dashboard Performance Status
         </div>
-        <a href="   recovery.php" class="btn btn-success btn-sm font-weight-bold px-4" style="border-radius: 20px;">ENGAGE RECOVERY PLAN</a>
+        {{#has_access}}
+            <button onclick="triggerRecoveryTools()" class="btn btn-success px-4 rounded-pill font-weight-bold shadow-sm">Engage Recovery Plan</button>
+        {{/has_access}}
+        {{^has_access}}
+            <a href="recovery.php" class="btn btn-success px-4 rounded-pill font-weight-bold shadow-sm">Engage Recovery Plan</a>
+        {{/has_access}}
     </div>
 
-    {{! Main Chart with Toggle & Subtitles }}
-    <div class="mb-5">
-        <div class="d-flex justify-content-between align-items-end mb-3">
+    <div class="card p-4 shadow-sm border-0 mb-4" style="border-radius: 25px;">
+        <div class="d-flex justify-content-between align-items-start mb-4">
             <div>
-                <h3 class="m-0 font-weight-bold text-dark">{{chart_title}}</h3>
-                <p class="text-danger m-0 font-weight-bold" style="font-size: 0.9rem;"><i class="fa fa-magic mr-1"></i> {{chart_ai_subtitle}}</p>
+                <h3 class="font-weight-bold mb-0">{{chart_title}}</h3>
+                <p class="small text-muted mb-0"><i class="fa fa-magic mr-1"></i> {{chart_tooltip}}</p>
             </div>
             <div class="btn-group">
-                <a href="?type={{current_type}}&format=bar" class="btn btn-outline-secondary btn-sm {{#is_bar}}active{{/is_bar}}">Bar</a>
-                <a href="?type={{current_type}}&format=line" class="btn btn-outline-secondary btn-sm {{#is_line}}active{{/is_line}}">Line</a>
-                <a href="?type={{current_type}}&format=pie" class="btn btn-outline-secondary btn-sm {{#is_pie}}active{{/is_pie}}">Pie</a>
+                <a href="?type={{current_type}}&format=bar" class="btn btn-sm btn-outline-primary {{#is_bar}}active{{/is_bar}}">Bar</a>
+                <a href="?type={{current_type}}&format=line" class="btn btn-sm btn-outline-primary {{#is_line}}active{{/is_line}}">Line</a>
+                <a href="?type={{current_type}}&format=pie" class="btn btn-sm btn-outline-primary {{#is_pie}}active{{/is_pie}}">Pie</a>
             </div>
         </div>
-        <div class="p-3 border rounded bg-light">{{{main_chart}}}</div>
+        <div style="min-height: 350px;">{{{main_chart_html}}}</div>
     </div>
 
-    {{! Comparison Row: 3 Boxes (Last View, Previous View, AI Predictive) }}
-    <div class="row">
-        {{#history_blocks}}
-        <div class="col-md-3">
-            <div class="card h-100 border-0 shadow-sm bg-white" style="border-radius: 12px; border-top: 4px solid #007bff !important;">
-                <div class="card-body p-3">
-                    <h6 class="font-weight-bold text-primary mb-1" style="font-size: 0.8rem;">{{title}}</h6>
-                    <p class="small text-muted mb-2" style="font-size: 0.7rem; line-height: 1.2;">{{subtitle}}</p>
-                    <div style="transform: scale(0.9); transform-origin: top left;">{{{content}}}</div>
-                </div>
+    <div class="row mb-5">
+        <div class="col-md-4">
+            <div class="bg-white p-3 shadow-sm border cockpit-card" style="border-radius: 20px; height: 420px; overflow: hidden;">
+                <p class="small font-weight-bold text-muted">LAST VIEW: {{#last_viewed}}{{title}}{{/last_viewed}}{{^last_viewed}}None{{/last_viewed}}</p>
+                {{{last_viewed.html}}}
             </div>
         </div>
-        {{/history_blocks}}
-        
-        
-            <div class="terminal-container p-3 shadow bg-dark" style="border-radius: 20px; height: 400px; display: flex; flex-direction: column;">
-                <div class="terminal-header text-center small text-success border-bottom border-secondary pb-2 mb-2">AI PREDICTIVE MINER</div>
-                <div id="ai-log" class="flex-grow-1 overflow-auto p-2 text-success" style="font-family: monospace; font-size: 0.9rem;">
-                    > System standby... Ready for input.
-                </div>
+        <div class="col-md-4">
+            <div class="bg-white p-3 shadow-sm border cockpit-card" style="border-radius: 20px; height: 420px; overflow: hidden;">
+                <p class="small font-weight-bold text-muted">PREVIOUS VIEW: {{#prev_viewed}}{{title}}{{/prev_viewed}}{{^prev_viewed}}None{{/prev_viewed}}</p>
+                {{{prev_viewed.html}}}
             </div>
-        
+        </div>
+        <div class="col-md-4">
+            <div class="bg-white p-3 shadow-sm border cockpit-card" style="border-radius: 20px; height: 420px; display: flex; flex-direction: column;">
+                <p class="small font-weight-bold text-center text-muted">AI PREDICTIVE MINER</p>
+                <div id="ai-chat-box" style="background:#0d1117; color:#00ff41; flex-grow:1; border-radius:12px; padding:15px; font-family:monospace; overflow-y: auto;">
+                    {{#has_access}}> Neural Engine Ready...<br>> System active.{{/has_access}}
+                    {{^has_access}}<div class="text-center mt-5 text-white"><i class="fa fa-lock fa-3x mb-3"></i><br>Insights Locked</div>{{/has_access}}
+                </div>
+                {{#has_access}}
+                <div class="input-group mt-2">
+                    <input type="text" id="ai-user-q" class="form-control" placeholder="Ask AI...">
+                    <button class="btn btn-primary" onclick="triggerAI()">Query</button>
+                </div>
+                {{/has_access}}
+            </div>
+        </div>
     </div>
-<div class="cta-container text-center p-5 mb-5 bg-light" style="border-radius: 30px; border: 2px dashed #007bff;">
+
+    <div class="cta-container text-center p-5 mb-5 bg-light" style="border-radius: 30px; border: 2px dashed #007bff;">
         <h4 class="font-weight-bold">Need a Specialized Deep Dive?</h4>
         <button class="btn btn-primary rounded-pill px-5 mt-2 shadow">Contact Us</button>
     </div>
