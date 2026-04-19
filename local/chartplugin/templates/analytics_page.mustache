@@ -1,65 +1,104 @@
-<div class="chartplugin-content mx-5">
-    <div class="alert bg-white shadow-sm d-flex justify-content-between align-items-center my-4 p-3" 
-         style="border-left: 6px solid #ff002d; border-radius: 15px;">
+<div class="chartplugin-content mx-5 pb-5">
+    {{! AI HERO }}
+    <div class="alert bg-white shadow-sm d-flex justify-content-between align-items-center my-4 p-3 deb-ai-hero" style="border-left: 6px solid #ff002d; border-radius: 15px;">
         <div class="h6 mb-0 font-weight-bold text-dark">
-            <i class="fa fa-robot mr-2 text-primary"></i>AI Dashboard Performance Status
+            <i class="fa fa-graduation-cap mr-2 text-primary"></i>Study Status: {{{ai_hero_text}}}
         </div>
-        {{#has_access}}
-            <button onclick="triggerRecoveryTools()" class="btn btn-success px-4 rounded-pill font-weight-bold shadow-sm">Engage Recovery Plan</button>
-        {{/has_access}}
-        {{^has_access}}
-            <a href="recovery.php" class="btn btn-success px-4 rounded-pill font-weight-bold shadow-sm">Engage Recovery Plan</a>
-        {{/has_access}}
+        <a href="recovery.php" class="btn btn-success px-4 rounded-pill font-weight-bold shadow-sm">Boost Performance</a>
     </div>
 
-    <div class="card p-4 shadow-sm border-0 mb-4" style="border-radius: 25px;">
+    {{! MAIN CHART CARD }}
+    <div class="card p-4 shadow-sm border-0 deb-chart-card">
         <div class="d-flex justify-content-between align-items-start mb-4">
             <div>
-                <h3 class="font-weight-bold mb-0">{{chart_title}}</h3>
-                <p class="small text-muted mb-0"><i class="fa fa-magic mr-1"></i> {{chart_tooltip}}</p>
+                <h3 class="font-weight-bold mb-0 text-dark">{{chart_title}}</h3>
+                <p class="small text-muted mb-0">{{chart_tooltip}}</p>
             </div>
-            <div class="btn-group">
+            <div class="btn-group shadow-sm">
                 <a href="?type={{current_type}}&format=bar" class="btn btn-sm btn-outline-primary {{#is_bar}}active{{/is_bar}}">Bar</a>
                 <a href="?type={{current_type}}&format=line" class="btn btn-sm btn-outline-primary {{#is_line}}active{{/is_line}}">Line</a>
                 <a href="?type={{current_type}}&format=pie" class="btn btn-sm btn-outline-primary {{#is_pie}}active{{/is_pie}}">Pie</a>
             </div>
         </div>
-        <div style="min-height: 350px;">{{{main_chart_html}}}</div>
-    </div>
-
-    <div class="row mb-5">
-        <div class="col-md-4">
-            <div class="bg-white p-3 shadow-sm border cockpit-card" style="border-radius: 20px; height: 420px; overflow: hidden;">
-                <p class="small font-weight-bold text-muted">LAST VIEW: {{#last_viewed}}{{title}}{{/last_viewed}}{{^last_viewed}}None{{/last_viewed}}</p>
-                {{{last_viewed.html}}}
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="bg-white p-3 shadow-sm border cockpit-card" style="border-radius: 20px; height: 420px; overflow: hidden;">
-                <p class="small font-weight-bold text-muted">PREVIOUS VIEW: {{#prev_viewed}}{{title}}{{/prev_viewed}}{{^prev_viewed}}None{{/prev_viewed}}</p>
-                {{{prev_viewed.html}}}
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="bg-white p-3 shadow-sm border cockpit-card" style="border-radius: 20px; height: 420px; display: flex; flex-direction: column;">
-                <p class="small font-weight-bold text-center text-muted">AI PREDICTIVE MINER</p>
-                <div id="ai-chat-box" style="background:#0d1117; color:#00ff41; flex-grow:1; border-radius:12px; padding:15px; font-family:monospace; overflow-y: auto;">
-                    {{#has_access}}> Neural Engine Ready...<br>> System active.{{/has_access}}
-                    {{^has_access}}<div class="text-center mt-5 text-white"><i class="fa fa-lock fa-3x mb-3"></i><br>Insights Locked</div>{{/has_access}}
-                </div>
-                {{#has_access}}
-                <div class="input-group mt-2">
-                    <input type="text" id="ai-user-q" class="form-control" placeholder="Ask AI...">
-                    <button class="btn btn-primary" onclick="triggerAI()">Query</button>
-                </div>
-                {{/has_access}}
-            </div>
+        <div style="height: 400px; width: 100%;">
+            {{{main_chart_html}}}
         </div>
     </div>
 
-    <div class="cta-container text-center p-5 mb-5 bg-light" style="border-radius: 30px; border: 2px dashed #007bff;">
-        <h4 class="font-weight-bold">Need a Specialized Deep Dive?</h4>
-        <button class="btn btn-primary rounded-pill px-5 mt-2 shadow">Contact Us</button>
+    {{! COCKPIT ROW - Historical Row }}
+    <div class="row mb-5 deb-historical-row">
+        {{! LAST ANALYSIS }}
+        <div class="col-md-3">
+            <div class="bg-white p-3 shadow-sm border" style="border-radius: 20px; height: 550px; overflow: hidden;">
+                <p class="small font-weight-bold text-primary mb-1 text-uppercase">Last Analysis</p>
+                <p class="small font-weight-bold text-dark">{{last_viewed.title}}</p>
+                <hr>
+                <div style="height: 400px;">
+                    {{{last_viewed.html}}}
+                </div>
+            </div>
+        </div>
+
+        {{! PREVIOUS ANALYSIS }}
+        <div class="col-md-3">
+            <div class="bg-white p-3 shadow-sm border" style="border-radius: 20px; height: 550px; overflow: hidden;">
+                <p class="small font-weight-bold text-primary mb-1 text-uppercase">Previous Analysis</p>
+                <p class="small font-weight-bold text-dark">{{prev_viewed.title}}</p>
+                <hr>
+                <div style="height: 400px;">
+                    {{{prev_viewed.html}}}
+                </div>
+            </div>
+        </div>
+        
+        {{! AI ANALYST - RAISED BLUE BORDER }}
+        <div class="col-md-6">
+            <div class="card h-100 deb-ai-analyst-card" style="border-radius: 20px; min-height: 550px;">
+                <div class="card-header text-white text-center py-2" style="background: #007bff; border-radius: 12px 12px 0 0;">
+                    <span class="small font-weight-bold" style="letter-spacing: 2px;">AI ANALYST</span>
+                </div>
+                <div class="card-body d-flex flex-column p-3">
+                    <div id="ai-chat-box" style="flex-grow:1; overflow-y: auto; padding: 10px;">
+                        <div class="mb-3">
+                            <div class="d-inline-block p-3 rounded shadow-sm bg-light text-dark" style="max-width: 85%; border-radius: 15px 15px 15px 0px !important; border-left: 4px solid #007bff;">
+                                Analyzing current telemetry for **{{chart_title}}**. What specific performance metric can I explain for you?
+                            </div>
+                        </div>
+                    </div>
+
+                    {{#is_enterprise}}
+                    <div class="mt-2 pt-2 border-top">
+                        <div class="input-group bg-white rounded-pill p-1 shadow-sm border">
+                            <input type="text" id="ai-user-q" class="form-control border-0 bg-transparent px-3" 
+                                   placeholder="Ask about this cohort..." 
+                                   onkeypress="if(event.key === 'Enter') triggerAI()">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary rounded-circle" onclick="triggerAI()" style="width: 40px; height: 40px;">
+                                    <i class="fa fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {{/is_enterprise}}
+
+                    {{^is_enterprise}}
+                    <div class="text-center p-4">
+                        <div class="badge badge-warning mb-2">PRO FEATURE</div><br>
+                        <small class="text-muted text-uppercase font-weight-bold">Unlock the AI Analyst to get score predictions.</small>
+                    </div>
+                    {{/is_enterprise}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{! DEEP DIVE CTA }}
+    <div class="cta-container text-center p-5 mb-5 bg-white shadow-sm border mt-5" style="border-radius: 30px;">
+        <h3 class="font-weight-bold text-dark">Need a Specialized Deep Dive?</h3>
+        <p class="text-muted mx-auto" style="max-width: 600px;">Request a bespoke audit of your team's cognitive telemetry via our priority assessment desk.</p>
+        <button class="btn btn-primary rounded-pill px-5 shadow-sm" onclick="window.location.href='audit_request.php'">
+            Request Audit
+        </button>
     </div>
 </div>
 
@@ -68,18 +107,22 @@ function triggerAI() {
     const input = document.getElementById('ai-user-q');
     const box = document.getElementById('ai-chat-box');
     if (!input || !box || input.value.trim() === "") return;
-    const q = input.value; input.value = "";
-    box.innerHTML += `<div class="mt-2 small text-info text-right"><em>${q}</em></div>`;
+    
+    const q = input.value;
+    input.value = "";
+    
+    // User bubble (Navy Blue)
+    box.innerHTML += `<div class="mb-3 text-right"><div class="d-inline-block p-2 rounded text-white shadow-sm" style="background: #001f3f; max-width: 85%; border-radius: 15px 15px 0px 15px !important;">${q}</div></div>`;
+    
+    // AI Analyst response (Context aware)
     setTimeout(() => {
-        let resp = "{{#is_trial}}Trial insights enabled. Your velocity is 12% above cohort.{{/is_trial}}{{#is_enterprise}}Enterprise status active. High-fidelity mapping in progress.{{/is_enterprise}}";
-        box.innerHTML += `<div class="mt-2 ai-response"><strong>AI Analyst:</strong> ${resp}</div>`;
+        box.innerHTML += `
+            <div class="mb-3">
+                <div class="d-inline-block p-3 rounded shadow-sm bg-white text-dark" style="max-width: 85%; border-radius: 15px 15px 15px 0px !important; border-left: 4px solid #28a745;">
+                    <strong>AI Analyst:</strong> Evaluating your query against the **{{chart_title}}** cohort data. I've identified a 12% variance in the sub-metrics that correlates with your question. We should address the specific outliers shown in the primary visualization to stabilize the score.
+                </div>
+            </div>`;
         box.scrollTop = box.scrollHeight;
-    }, 1000);
-}
-
-function triggerRecoveryTools() {
-    const box = document.getElementById('ai-chat-box');
-    box.innerHTML += `<div class="mt-3 p-2 bg-success text-white small" style="border-radius: 5px;"><strong>Protocol:</strong> Recovery plan engaged. Analyzing proficiency gaps...</div>`;
-    box.scrollTop = box.scrollHeight;
+    }, 750);
 }
 </script>

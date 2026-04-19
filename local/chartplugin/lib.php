@@ -126,3 +126,42 @@ function local_chartplugin_save_history($data) {
         array_pop($SESSION->chart_history);
     }
 }
+
+/**
+ * Core access check for Enterprise features.
+ * Priority: Session Toggle -> Trial Check -> Subscription Expiry -> Credit Balance.
+ */
+function local_chartplugin_get_access_status() {
+    global $USER, $DB, $SESSION;
+
+    // 1. Manual Session Toggle for Admin Testing.
+    // Use index.php?test_lock=on to force a locked state.
+    if (!empty($SESSION->local_chartplugin_force_lock)) {
+        return 'freemium';
+    }
+
+    // 2. Trial Period Check (7 Days from account creation).
+    $trial_duration = 7 * 24 * 60 * 60;
+    if (($USER->timecreated + $trial_duration) > time()) {
+        return 'enterprise';
+    }
+
+    // 3. Subscription & Credit Check.
+    $record = $DB->get_record('local_chartplugin_payments', ['userid' => $USER->id]);
+    if ($record) {
+        // Check if subscription timestamp is still in the future.
+        if (!empty($record->valid_until) && $record->valid_until > time()) {
+            return 'enterprise';
+        }
+        // Check if they have unused credits.
+        if ($record->credits > 0) {
+            // Note: We don't return enterprise here automatically so they 
+            // have to "click" the Boost button to activate the 30-day window.
+            if (get_user_preference('local_chartplugin_license', 'freemium', $USER->id) === 'enterprise') {
+                return 'enterprise';
+            }
+        }
+    }
+
+    return 'freemium';
+}

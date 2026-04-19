@@ -137,3 +137,45 @@ body #page-wrapper footer#page-footer.debtheme-footer {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* Custom Menu Active Button - Deep Navy Blue */
+.deb-nav-btn.active, 
+.deb-active-now, 
+.local-chartplugin-active-nav {
+    background-color: #001f3f !important;
+    color: #ffffff !important;
+    border: 2px solid #ffc107 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+    font-weight: bold;
+}
+
+/* AI Analyst Raised Shadow & Clean Background */
+.deb-ai-analyst-card {
+    border: 5px solid #007bff !important;
+    box-shadow: 0 20px 40px rgba(0, 31, 63, 0.25) !important;
+    background-color: #ffffff !important;
+    transition: transform 0.3s ease;
+}
+
+.deb-ai-analyst-card:hover {
+    transform: translateY(-5px);
+}
+
+/* AI Chat Box Clean Slate */
+#ai-chat-box {
+    background: #ffffff !important;
+    background-image: none !important;
+    border-radius: 10px;
+}
+
+/* Spacing fix for Chart Labels */
+.deb-chart-card {
+    margin-bottom: 85px !important;
+    border-radius: 25px;
+    z-index: 1;
+}
+
+/* Historical Row Spacing */
+.deb-historical-row {
+    margin-top: 60px !important;
+}
