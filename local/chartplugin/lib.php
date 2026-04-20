@@ -8,9 +8,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * 1. NAVIGATION API HOOKS
- * Adds the Flight Deck to the Moodle main drawer and user menu.
  */
-
 function local_chartplugin_extend_navigation(global_navigation $nav) {
     if (isloggedin()) {
         $node = $nav->add(
@@ -38,9 +36,7 @@ function local_chartplugin_extend_navigation_user(navigation_node $navnode, $use
 
 /**
  * 2. GRADEBOOK API HELPERS
- * Functions to pull live data for our dynamic charts.
  */
-
 function local_chartplugin_get_user_grade($userid, $courseid) {
     global $DB;
     $sql = "SELECT gg.finalgrade 
@@ -101,67 +97,68 @@ function local_chartplugin_get_grade_distribution($courseid) {
 }
 
 /**
- * 3. FILE API (PDF GENERATION STUB)
- * Prepared for Sprint 3 - Premium PDF Downloads
- */
-function local_chartplugin_get_report_filename($userid) {
-    return "Flight_Log_User_" . $userid . "_" . date('Y-m-d') . ".pdf";
-}
-
-/**
- * Saves current chart data into the Moodle Session to drive the Cockpit UI.
+ * 3. HISTORY & SESSION API
  */
 function local_chartplugin_save_history($data) {
     global $SESSION;
     if (!isset($SESSION->chart_history)) {
         $SESSION->chart_history = [];
     }
-    // Don't save if it's the same as the last one
     if (!empty($SESSION->chart_history) && $SESSION->chart_history[0] === $data) {
         return;
     }
     array_unshift($SESSION->chart_history, $data);
-    // Keep only the last 3 views
     if (count($SESSION->chart_history) > 3) {
         array_pop($SESSION->chart_history);
     }
 }
 
 /**
- * Core access check for Enterprise features.
- * Priority: Session Toggle -> Trial Check -> Subscription Expiry -> Credit Balance.
+ * 4. CORE ACCESS CHECK (Day 9 Polish)
  */
 function local_chartplugin_get_access_status() {
-    global $USER, $DB, $SESSION;
+    global $USER, $DB;
 
-    // 1. Manual Session Toggle for Admin Testing.
-    // Use index.php?test_lock=on to force a locked state.
-    if (!empty($SESSION->local_chartplugin_force_lock)) {
-        return 'freemium';
-    }
+    // 1. Fetch the DB record first to see if we have manual overrides or credits
+    $records = $DB->get_records('local_chartplugin_payments', ['userid' => $USER->id], 'id DESC', '*', 0, 1);
+    $record = reset($records);
 
-    // 2. Trial Period Check (7 Days from account creation).
-    $trial_duration = 7 * 24 * 60 * 60;
-    if (($USER->timecreated + $trial_duration) > time()) {
+    // 2. Priority: If a manual "valid_until" exists and is in the future, it's Enterprise
+    if ($record && !empty($record->valid_until) && $record->valid_until > time()) {
         return 'enterprise';
     }
 
-    // 3. Subscription & Credit Check.
-    $record = $DB->get_record('local_chartplugin_payments', ['userid' => $USER->id]);
-    if ($record) {
-        // Check if subscription timestamp is still in the future.
-        if (!empty($record->valid_until) && $record->valid_until > time()) {
+    // 3. Trial Period Check
+    // ADMIN FIX: We ignore the trial for Admins so you can test the "Boost" button logic
+    if (!is_siteadmin()) {
+        $trial_duration = 7 * 24 * 60 * 60;
+        if (isset($USER->timecreated) && ($USER->timecreated + $trial_duration) > time()) {
             return 'enterprise';
-        }
-        // Check if they have unused credits.
-        if ($record->credits > 0) {
-            // Note: We don't return enterprise here automatically so they 
-            // have to "click" the Boost button to activate the 30-day window.
-            if (get_user_preference('local_chartplugin_license', 'freemium', $USER->id) === 'enterprise') {
-                return 'enterprise';
-            }
         }
     }
 
     return 'freemium';
+}
+
+/**
+ * 5. PAYMENT CALLBACK (Standard Moodle Style)
+ */
+class local_chartplugin_payment_callback {
+    public static function deliver_order($paymentid, $userid, $amount, $currency, $areaid) {
+        global $DB;
+        $credits_to_add = (int)$amount; 
+        
+        $record = $DB->get_record('local_chartplugin_payments', ['userid' => $userid]);
+        if ($record) {
+            $record->credits += $credits_to_add;
+            $DB->update_record('local_chartplugin_payments', $record);
+        } else {
+            $newrecord = new stdClass();
+            $newrecord->userid = $userid;
+            $newrecord->credits = $credits_to_add;
+            $newrecord->status = 'active';
+            $DB->insert_record('local_chartplugin_payments', $newrecord);
+        }
+        return true;
+    }
 }
