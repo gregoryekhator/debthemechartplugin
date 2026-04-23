@@ -13,15 +13,28 @@ class processor {
         // Fetch the payment record to get the amount/currency logged by core
         $payment = $DB->get_record('payments', ['id' => $paymentid]);
 
+        // 1. Update the BALANCE (Current credits)
         $record = new \stdClass();
         $record->userid = $userid;
-        $record->credits = $itemid; // Our package amount (10, 50, etc)
+        $record->credits = $itemid;
         $record->amount = $payment ? $payment->amount : 0.00;
-        $record->currency = $payment ? $payment->currency : 'USD';
+        $record->currency = $payment ? $payment->currency : 'GBP';
         $record->status = 'active';
         $record->transactionid = $paymentid;
         $record->timecreated = time();
+        $DB->insert_record('local_chartplugin_payments', $record);
+
+        // 2. NEW: Write to the HISTORY (Receipt log)
+        $history = new \stdClass();
+        $history->userid = $userid;
+        $history->itemid = $itemid; // e.g. 10
+        $history->amount = $payment ? $payment->amount : 0.00;
+        $history->currency = $payment ? $payment->currency : 'GBP';
+        $history->paymentid = $paymentid;
+        $history->type = 'purchase';
+        $history->timecreated = time();
+        $DB->insert_record('local_chartplugin_history', $history);
         
-        return (bool)$DB->insert_record('local_chartplugin_payments', $record);
+        return true;
     }
 }

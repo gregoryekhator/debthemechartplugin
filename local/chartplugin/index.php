@@ -129,6 +129,38 @@ echo '<div class="alert alert-info d-flex justify-content-between align-items-ce
                   </a>';
         }
     echo '</div>';
+    // The Unified Status & Action Bar
+echo '<div class="alert alert-info d-flex justify-content-between align-items-center shadow-sm mb-4" style="border-left: 5px solid #007bff; background-color: #f8fbff;">';
+    echo '<div>';
+        echo '<span class="mr-3"><strong>Credits:</strong> <span class="badge badge-pill badge-primary" style="font-size: 1rem;">' . $current_credits . '</span></span>';
+        
+        // NEW: History Button
+        echo '<a href="history.php" class="btn btn-sm btn-link text-muted mr-3" title="View Transaction History">
+                <i class="fa fa-history"></i> History
+              </a>';
+
+        if (!$is_enterprise) {
+            echo '<a href="'.$buy_url.'" class="btn btn-sm btn-outline-primary font-weight-bold shadow-sm py-1">
+                    <i class="fa fa-plus-circle"></i> TOP UP
+                  </a>';
+        }
+        
+        echo '<span class="ml-4 d-none d-md-inline text-muted small border-left pl-3"><strong>Status:</strong> ' . $today_label . '</span>';
+    echo '</div>';
+    
+    echo '<div class="d-flex align-items-center">';
+        if (has_capability('moodle/site:config', context_system::instance())) {
+            echo '<a href="manage.php" class="btn btn-dark btn-sm font-weight-bold shadow-sm mr-2">
+                    <i class="fa fa-cog"></i> Control Center
+                  </a>';
+        }
+        if (!$is_enterprise && $current_credits > 0) {
+            echo '<a href="recovery.php" class="btn btn-success btn-sm shadow-sm px-3 font-weight-bold">
+                    <i class="fa fa-bolt"></i> Boost Performance
+                  </a>';
+        }
+    echo '</div>';
+echo '</div>';
 echo '</div>';
 
 echo $renderer->render_from_template('local_chartplugin/custom_header', $template_data);
