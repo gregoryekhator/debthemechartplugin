@@ -1,0 +1,35 @@
+# Query: Flight deck
+# Flags: WordMatch
+# Including: ./moodle_test/local/chartplugin
+# ContextLines: 1
+
+6 results - 5 files
+
+moodle_test • local/chartplugin/audit_request.php:
+  43              <p class="text-muted">Our AI Analysts will review your telemetry and contact you within 24 hours.</p>
+  44:             <a href="index.php" class="btn btn-primary rounded-pill mt-3">Back to Learning Dashboard</a>
+  45          </div>
+
+moodle_test • local/chartplugin/buy.php:
+  14  $PAGE->set_context(context_system::instance());
+  15: // REPLACEMENT: Changed "Flight Deck" to "Learning Dashboard"
+  16  $PAGE->set_title("Top Up: Learning Credits");
+
+moodle_test • local/chartplugin/lib.php:
+   3   * Path: /var/www/html/moodle_test/local/chartplugin/lib.php
+   4:  * Library for Debonair Learning Dashboard (Phase 4 Production Build)
+   5   */
+
+  27      $navnode->add(
+  28:         'Learning Dashboard', 
+  29          new moodle_url('/local/chartplugin/index.php'), 
+
+moodle_test • local/chartplugin/settings.php:
+  8      // Parameter 1 MUST match the folder name 'local_chartplugin'
+  9:     $settings = new admin_settingpage('local_chartplugin', 'Chart Plugin: Learning Dashboard');
+  10  
+
+moodle_test • local/chartplugin/classes/external/upgrade_user.php:
+  26  
+  27:         // Update the user's Learning Dashboard status in the database
+  28          // We use set_user_preference so it persists across sessions

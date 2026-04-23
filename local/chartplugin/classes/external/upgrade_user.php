@@ -24,7 +24,7 @@ class upgrade_user extends external_api {
         // Security check: Ensure the caller is authorized
         self::validate_context(\context_system::instance());
 
-        // Update the user's flight deck status in the database
+        // Update the user's Learning Dashboard status in the database
         // We use set_user_preference so it persists across sessions
         set_user_preference('local_chartplugin_license', $license_type, $userid);
 

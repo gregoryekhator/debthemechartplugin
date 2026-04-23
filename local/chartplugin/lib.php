@@ -144,21 +144,48 @@ function local_chartplugin_get_access_status() {
  * 5. PAYMENT CALLBACK (Standard Moodle Style)
  */
 class local_chartplugin_payment_callback {
-    public static function deliver_order($paymentid, $userid, $amount, $currency, $areaid) {
+
+    /**
+     * Provides the cost to the Payment Gateway.
+     * $itemid in our case is the number of credits the user selected (10, 50, or 100).
+     */
+    public static function get_amount(string $paymentarea, int $itemid): \core_payment\amount {
+        // Map the itemid (credits) to a price
+        $prices = [
+            10  => 5.00,
+            50  => 20.00,
+            100 => 35.00
+        ];
+
+        $price = $prices[$itemid] ?? 5.00; // Default to $5 if something goes wrong
+        return new \core_payment\amount($price, 'USD');
+    }
+
+    /**
+     * This is called automatically by Moodle AFTER the PayPal transaction is successful.
+     */
+    public static function deliver_order(int $paymentid, int $userid, float $amount, string $currency, int $itemid): bool {
         global $DB;
-        $credits_to_add = (int)$amount; 
+        
+        // Use $itemid (the number of credits purchased) rather than the dollar amount
+        $credits_to_add = $itemid; 
         
         $record = $DB->get_record('local_chartplugin_payments', ['userid' => $userid]);
+        
         if ($record) {
+            // Update existing balance
             $record->credits += $credits_to_add;
             $DB->update_record('local_chartplugin_payments', $record);
         } else {
+            // Create new record for first-time buyers
             $newrecord = new stdClass();
             $newrecord->userid = $userid;
             $newrecord->credits = $credits_to_add;
             $newrecord->status = 'active';
+            $newrecord->valid_until = 0;
             $DB->insert_record('local_chartplugin_payments', $newrecord);
         }
+
         return true;
     }
 }
