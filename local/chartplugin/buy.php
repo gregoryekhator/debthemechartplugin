@@ -1,7 +1,6 @@
 <?php
 /**
  * Path: /local/chartplugin/buy.php
- * Purpose: Professional Credit Storefront (Fixed for Moodle 4.5 Modal)
  */
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
@@ -12,11 +11,10 @@ require_login();
 
 $PAGE->set_url(new moodle_url('/local/chartplugin/buy.php'));
 $PAGE->set_context(context_system::instance());
-// REPLACEMENT: Changed "Flight Deck" to "Learning Dashboard"
 $PAGE->set_title("Top Up: Learning Credits");
 $PAGE->set_heading("Boost Your Learning Dashboard");
 
-// IMPORTANT: This JS requirement is what makes the modal work.
+// Modal JS Requirement
 $PAGE->requires->js_call_amd('core_payment/gateways_modal', 'init');
 
 echo $OUTPUT->header();
@@ -29,7 +27,7 @@ $packages = [
 
 echo '<div class="row justify-content-center mt-4">';
 foreach ($packages as $pkg) {
-    // FIX: Generate parameters for the Modal instead of a direct URL
+    // Generate parameters for the Modal
     $params = \core_payment\helper::gateways_modal_link_params(
         'local_chartplugin', 
         'credits', 
@@ -37,7 +35,6 @@ foreach ($packages as $pkg) {
         "Purchase {$pkg['amount']} Learning Credits"
     );
 
-    // Convert array params into HTML attributes
     $attributes = '';
     foreach ($params as $name => $value) {
         $attributes .= ' ' . $name . '="' . s($value) . '"';
@@ -53,7 +50,7 @@ foreach ($packages as $pkg) {
                 <div class='mt-auto'>
                     <h2 class='mb-3'>\${$pkg['price']}</h2>
                     <button class='btn btn-primary btn-lg btn-block shadow-sm' {$attributes}>
-                        <i class='fa fa-paypal'></i> Buy Now
+                        <i class='fa fa-credit-card'></i> Buy Now
                     </button>
                 </div>
             </div>

@@ -1,0 +1,160 @@
+/* --------------------------------------------------------------------------
+   1. GLOBAL PAGE STRUCTURE & DASHBOARD CONTAINER
+   -------------------------------------------------------------------------- */
+/* BREAKOUT: This forces the footer to ignore the parent container's width */
+
+/* Internal alignment: This keeps the text inside the footer aligned with your dashboard */
+.footer-content-wrapper {
+    max-width: 1140px !important;
+    margin: 0 auto !important;
+    padding: 0 15px !important;
+}
+
+   #page-local-chartplugin-index #region-main,
+#deb-dashboard-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background-color: #f8f9fc !important;
+}
+
+/* 2. BLUE HERO HEADER */
+.deb-blue-header {
+    background: #007bff !important;
+    color: white !important;
+    border-radius: 0 0 25px 25px !important;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    margin-bottom: 20px;
+}
+
+/* 3. NAVIGATION BUTTONS */
+.deb-nav-btn {
+    border-radius: 20px !important;
+    margin: 0 5px;
+    transition: all 0.2s;
+}
+
+.deb-nav-btn.active, 
+.deb-active-now {
+    background-color: #001f3f !important;
+    color: #ffffff !important;
+    border: 2px solid #ffc107 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+    font-weight: bold;
+    transform: scale(1.02);
+}
+
+/* 4. MAIN/SIDEBAR FLEX (75/25 Split) */
+.deb-main-content-row {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    margin: 0 !important;
+}
+
+.deb-chart-col {
+    flex: 0 0 75% !important;
+    max-width: 75% !important;
+    padding-right: 15px;
+}
+
+.deb-sidebar-col {
+    flex: 0 0 25% !important;
+    max-width: 25% !important;
+}
+
+/* 5. HISTORICAL VIEW (30:30:40 Ratio) */
+.deb-historical-row-rebalance {
+    display: flex !important;
+    width: 100% !important;
+    gap: 20px !important;
+    margin-top: 20px !important;
+    align-items: stretch !important;
+}
+
+.deb-col-left-30, 
+.deb-col-mid-30 {
+    flex: 0 0 30% !important;
+    max-width: 30% !important;
+    width: 30% !important;
+}
+
+.deb-col-right-40 {
+    flex: 0 0 40% !important;
+    max-width: 40% !important;
+    width: 40% !important;
+}
+
+/* 6. UI CARDS & AI ANALYST */
+.deb-chart-card {
+    padding: 1.2rem !important;
+    margin-bottom: 20px !important;
+    border-radius: 20px !important;
+    background: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.deb-ai-analyst-card {
+    border: 5px solid #007bff !important;
+    box-shadow: 0 20px 40px rgba(0, 31, 63, 0.25) !important;
+    background-color: #ffffff !important;
+}
+
+/* 7. FULL-WIDTH VIEWPORT FOOTER */
+
+/* Ensure the wrapper inside the breakout doesn't stretch text to screen edges */
+footer#page-footer.debtheme-footer .footer-content-wrapper,
+footer#page-footer.debtheme-footer .container-fluid {
+    max-width: 1140px !important;
+    margin: 0 auto !important;
+}
+
+/* The "Negative Margin" Breakout Technique */
+.debtheme-footer {
+    width: 100vw !important;
+    position: relative !important;
+    left: 50% !important;
+    right: 50% !important;
+    margin-left: -50vw !important;
+    margin-right: -50vw !important;
+    background: #003d80 !important; /* Match your header blue */
+    padding: 40px 0 !important;
+}
+
+/* Re-align the content inside the stretched footer */
+.debtheme-footer .container-xl {
+    max-width: 1140px !important; /* Match your main body width */
+    margin: 0 auto !important;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Fix the white data visibility (Email, Tel, Web) */
+.debtheme-footer p, 
+.debtheme-footer span, 
+.debtheme-footer i, 
+.debtheme-footer a {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+/* THE BREAKOUT FOOTER FIX */
+body #page-wrapper footer#page-footer.debtheme-footer {
+    width: 100vw !important;
+    position: relative !important;
+    left: 50% !important;
+    right: 50% !important;
+    margin-left: -50vw !important; /* The negative margin trick */
+    margin-right: -50vw !important;
+    background-color: #0d6efd !important;
+    border-radius: 0 !important; /* Footers usually shouldn't have rounds if full-width */
+    padding: 40px 0 !important;
+}
+
+/* Re-center the text inside the breakout */
+#page-footer.debtheme-footer .container-xl,
+#page-footer.debtheme-footer .footer-main-content {
+    max-width: 1140px !important;
+    margin: 0 auto !important;
+}

@@ -8,22 +8,40 @@
     </div>
 
     {{! MAIN CHART CARD }}
-    <div class="card p-4 shadow-sm border-0 deb-chart-card" style="border-radius: 25px; margin-bottom: 85px;">
-        <div class="d-flex justify-content-between align-items-start mb-4">
-            <div>
-                <h3 class="font-weight-bold mb-0 text-dark">{{chart_title}}</h3>
-                <p class="small text-muted mb-0">{{chart_tooltip}}</p>
-            </div>
-            <div class="btn-group shadow-sm">
-                <a href="?type={{current_type}}&format=bar" class="btn btn-sm btn-outline-primary {{#is_bar}}active{{/is_bar}}">Bar</a>
-                <a href="?type={{current_type}}&format=line" class="btn btn-sm btn-outline-primary {{#is_line}}active{{/is_line}}">Line</a>
-                <a href="?type={{current_type}}&format=pie" class="btn btn-sm btn-outline-primary {{#is_pie}}active{{/is_pie}}">Pie</a>
-            </div>
+<div class="card p-4 shadow-sm border-0 deb-chart-card" style="border-radius: 25px; margin-bottom: 20px; position: relative; z-index: 10; background: #fff;">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h3 class="font-weight-bold mb-0 text-dark">{{chart_title}}</h3>
+            <p class="small text-muted mb-0">{{chart_tooltip}}</p>
         </div>
-        <div style="height: 400px; width: 100%;">
-            {{{main_chart_html}}}
+        <div class="btn-group shadow-sm">
+            <a href="?type={{current_type}}&format=bar" class="btn btn-sm btn-outline-primary {{#is_bar}}active{{/is_bar}}">Bar</a>
+            <a href="?type={{current_type}}&format=line" class="btn btn-sm btn-outline-primary {{#is_line}}active{{/is_line}}">Line</a>
+            <a href="?type={{current_type}}&format=pie" class="btn btn-sm btn-outline-primary {{#is_pie}}active{{/is_pie}}">Pie</a>
         </div>
     </div>
+    
+    <div class="chart-render-container" style="min-height: 400px; width: 100%; background: #fff;">
+        {{{main_chart_html}}}
+        </div>
+
+        {{! Custom CSS to fix the Moodle Table overlap }}
+        <style>
+            .chart-render-container .chart-table-expandable {
+                background: #ffffff !important;
+                border: 1px solid #dee2e6;
+                border-radius: 10px;
+                margin-top: 20px;
+                padding: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                position: relative;
+                z-index: 20;
+            } 
+        </style>
+    </div>
+
+{{! Spacer to ensure the historical row doesn't get crushed }}
+<div style="height: 25px;"></div>
 
     {{! COCKPIT ROW - Historical & AI Analyst }}
     <div class="row mb-5 deb-historical-row" style="margin-top: 60px;">

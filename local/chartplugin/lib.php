@@ -1,7 +1,7 @@
 <?php
 /**
  * Path: /var/www/html/moodle_test/local/chartplugin/lib.php
- * Library for Debonair Learning Flight Deck (Phase 4 Production Build)
+ * Library for Debonair Learning Analytics Dashboard (Phase 4 Production Build)
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -25,7 +25,7 @@ function local_chartplugin_extend_navigation(global_navigation $nav) {
 
 function local_chartplugin_extend_navigation_user(navigation_node $navnode, $user, $context, $course, $abspath) {
     $navnode->add(
-        'Learning Flight Deck', 
+        'Learning Analytics Dashboard', 
         new moodle_url('/local/chartplugin/index.php'), 
         navigation_node::TYPE_SETTING, 
         null, 
@@ -144,48 +144,111 @@ function local_chartplugin_get_access_status() {
  * 5. PAYMENT CALLBACK (Standard Moodle Style)
  */
 class local_chartplugin_payment_callback {
-
-    /**
-     * Provides the cost to the Payment Gateway.
-     * $itemid in our case is the number of credits the user selected (10, 50, or 100).
-     */
-    public static function get_amount(string $paymentarea, int $itemid): \core_payment\amount {
-        // Map the itemid (credits) to a price
-        $prices = [
-            10  => 5.00,
-            50  => 20.00,
-            100 => 35.00
-        ];
-
-        $price = $prices[$itemid] ?? 5.00; // Default to $5 if something goes wrong
-        return new \core_payment\amount($price, 'USD');
-    }
-
-    /**
-     * This is called automatically by Moodle AFTER the PayPal transaction is successful.
-     */
-    public static function deliver_order(int $paymentid, int $userid, float $amount, string $currency, int $itemid): bool {
+    public static function deliver_order($paymentid, $userid, $amount, $currency, $areaid) {
         global $DB;
-        
-        // Use $itemid (the number of credits purchased) rather than the dollar amount
-        $credits_to_add = $itemid; 
+        $credits_to_add = (int)$amount; 
         
         $record = $DB->get_record('local_chartplugin_payments', ['userid' => $userid]);
-        
         if ($record) {
-            // Update existing balance
             $record->credits += $credits_to_add;
             $DB->update_record('local_chartplugin_payments', $record);
         } else {
-            // Create new record for first-time buyers
             $newrecord = new stdClass();
             $newrecord->userid = $userid;
             $newrecord->credits = $credits_to_add;
             $newrecord->status = 'active';
-            $newrecord->valid_until = 0;
             $DB->insert_record('local_chartplugin_payments', $newrecord);
         }
-
         return true;
     }
+}
+
+/**
+ * Creates a Learning Plan and populates it with a competency for a specific user.
+ */
+function local_chartplugin_prescribe_learning_plan($userid) {
+    global $DB, $USER;
+
+    // 1. Fetch the scale.
+    $scale = $DB->get_record_sql("SELECT id, scale FROM {scale} WHERE scale IS NOT NULL", [], IGNORE_MULTIPLE);
+    if (!$scale) {
+        throw new \moodle_exception('noscale', 'local_chartplugin');
+    }
+
+// 2. Build the configuration with STRICT integer types.
+$items = explode(',', $scale->scale);
+$config = [];
+$itemcount = count($items);
+
+foreach ($items as $index => $name) {
+    // We use a simple array structure. 
+    // Explicitly casting to (int) removes the quotes you see in your debug logs.
+    $config[] = [
+        'id' => (int)($index + 1),
+        'scaledefault' => ($index === 0) ? 1 : 0,
+        'proficient' => ($index === $itemcount - 1) ? 1 : 0
+    ];
+}
+
+// 3. Prepare the Framework data object.
+$frameworkdata = new \stdClass();
+$frameworkdata->shortname = 'AI Recovery Framework ' . time();
+$frameworkdata->idnumber = 'AI_REC_' . $userid . '_' . time();
+$frameworkdata->description = 'Automated recovery path.';
+$frameworkdata->descriptionformat = FORMAT_HTML;
+$frameworkdata->visible = 1;
+$frameworkdata->scaleid = (int)$scale->id;
+$frameworkdata->scaleconfiguration = json_encode($config); // Should now result in: [{"id":1,"scaledefault":1...}]
+$frameworkdata->contextid = \context_system::instance()->id;
+$frameworkdata->usermodified = $USER->id;
+$frameworkdata->timecreated = time();
+$frameworkdata->timemodified = time();
+
+    // 4. Force Create the Framework via DB (Bypassing the persistent validator)
+$frameworkid = $DB->insert_record('competency_framework', $frameworkdata);
+
+// Now load the framework object from the ID so the rest of the code works
+$framework = new \core_competency\competency_framework($frameworkid);
+
+    // 5. Create the Competency.
+    $competency = new \core_competency\competency(0, (object)[
+        'shortname' => 'Targeted Skill Recovery',
+        'idnumber' => 'SKILL_' . time(),
+        'description' => 'Focus area based on AI analytics.',
+        'descriptionformat' => FORMAT_HTML,
+        'competencyframeworkid' => $framework->get('id'),
+        'parentid' => 0,
+        'path' => '/',
+        'sortorder' => 0,
+        'usermodified' => $USER->id,
+        'timecreated' => time(),
+        'timemodified' => time()
+    ]);
+    $competency->create();
+
+    // 6. Create the Learning Plan.
+    $plan = new \core_competency\plan(0, (object)[
+        'name' => 'Personalized Recovery Plan for User ' . $userid,
+        'description' => 'AI generated recovery path.',
+        'descriptionformat' => FORMAT_HTML,
+        'userid' => $userid,
+        'status' => \core_competency\plan::STATUS_ACTIVE,
+        'usermodified' => $USER->id,
+        'timecreated' => time(),
+        'timemodified' => time()
+    ]);
+    $plan->create();
+
+    // 7. Link Competency to Plan.
+    $lpc = new \core_competency\plan_competency(0, (object)[
+        'planid' => $plan->get('id'),
+        'competencyid' => $competency->get('id'),
+        'sortorder' => 0,
+        'usermodified' => $USER->id,
+        'timecreated' => time(),
+        'timemodified' => time()
+    ]);
+    $lpc->create();
+
+    return $plan;
 }

@@ -12,6 +12,9 @@ require_login();
 require_capability('moodle/site:config', context_system::instance());
 
 $search = optional_param('search', '', PARAM_RAW);
+$targetuserid = optional_param('userid', 0, PARAM_INT);
+$newcredits   = optional_param('credits', null, PARAM_INT);
+$action       = optional_param('action', 'update', PARAM_ALPHA);
 
 $PAGE->set_url(new moodle_url('/local/chartplugin/manage.php'));
 $PAGE->set_context(context_system::instance());
@@ -21,11 +24,8 @@ $PAGE->set_heading("Learning Dashboard: Control Center");
 echo $OUTPUT->header();
 
 // --- 1. ACTION HANDLING ---
-$targetuserid = optional_param('userid', 0, PARAM_INT);
-$newcredits   = optional_param('credits', null, PARAM_INT);
-$action       = optional_param('action', 'update', PARAM_ALPHA);
-
 if ($targetuserid) {
+    // Check local_chartplugin_payments for the credit record
     $record = $DB->get_record('local_chartplugin_payments', ['userid' => $targetuserid]);
     
     if ($action === 'deactivate' && $record) {
@@ -33,25 +33,26 @@ if ($targetuserid) {
         $DB->update_record('local_chartplugin_payments', $record);
         echo $OUTPUT->notification("Access deactivated for User ID: $targetuserid", 'notifynotice');
     } else if ($newcredits !== null) {
-        // --- FIXED: DATABASE PERSISTENCE LOGIC ---
         if ($record) {
-            // Update existing row
             $record->credits = $newcredits;
+            // If they have 10+ credits, ensure they aren't 'expired'
+            if ($newcredits >= 10 && $record->valid_until < time()) {
+                $record->valid_until = time() + (365 * DAYSECS); 
+            }
             $DB->update_record('local_chartplugin_payments', $record);
         } else {
-            // Create a new row if user has never had credits before
             $newrecord = new stdClass();
             $newrecord->userid = $targetuserid;
             $newrecord->credits = $newcredits;
             $newrecord->status = 'active';
-            $newrecord->valid_until = 0;
+            $newrecord->valid_until = ($newcredits >= 10) ? time() + (365 * DAYSECS) : 0;
             $DB->insert_record('local_chartplugin_payments', $newrecord);
         }
         echo $OUTPUT->notification("Balance updated to $newcredits for User ID: $targetuserid.", 'notifysuccess');
     }
 }
 
-// --- 2. TOP NAV & SEARCH (Intuitive UI) ---
+// --- 2. TOP NAV & SEARCH ---
 echo '<div class="d-flex justify-content-between align-items-center mb-4">';
 echo '<a href="index.php" class="btn btn-secondary shadow-sm"><i class="fa fa-arrow-left"></i> Learning Dashboard</a>';
 echo '<form method="GET" class="form-inline">
@@ -84,7 +85,8 @@ echo '<table class="table table-hover mt-3 shadow-sm" style="background: #fff; b
 
 foreach ($users as $u) {
     $current = $u->credits ?? 0;
-    $is_active = (!empty($u->valid_until) && $u->valid_until > time());
+    // Logical Boost: Active if balance > 0 OR Enterprise if credits >= 10
+    $is_active = ($current >= 10) || (!empty($u->valid_until) && $u->valid_until > time());
     $status_badge = $is_active ? 'badge-success' : 'badge-secondary';
     
     echo "<tr>

@@ -30,7 +30,7 @@ $today_label = userdate(time(), '%A, %d %B %Y, %I:%M %p');
 $PAGE->set_url(new moodle_url('/local/chartplugin/index.php', ['type' => $type]));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('report');
-$PAGE->set_title("Learning Dashboard");
+$PAGE->set_title("Learning Analytics Dashboard");
 $renderer = $PAGE->get_renderer('local_chartplugin');
 
 // --- 4. NAVIGATION & LOCK LOGIC ---
@@ -98,69 +98,23 @@ $template_data = [
 // --- 8. OUTPUT ---
 echo $OUTPUT->header();
 
-$buy_url = new moodle_url('/local/chartplugin/buy.php');
-
-// The Unified Status & Action Bar
-echo '<div class="alert alert-info d-flex justify-content-between align-items-center shadow-sm mb-4" style="border-left: 5px solid #007bff; background-color: #f8fbff;">';
+// --- RESTORED INFO BAR (Balance + Date + Control Center) ---
+echo '<div class="alert alert-info d-flex justify-content-between align-items-center shadow-sm mb-4" style="border-left: 5px solid #007bff;">';
     echo '<div>';
-        echo '<span class="mr-3"><strong>Credits:</strong> <span class="badge badge-pill badge-primary" style="font-size: 1rem;">' . $current_credits . '</span></span>';
-        
-        // Permanent Top-Up Button (Always Visible for non-enterprise)
-        if (!$is_enterprise) {
-            echo '<a href="'.$buy_url.'" class="btn btn-sm btn-outline-primary font-weight-bold shadow-sm py-1">
-                    <i class="fa fa-plus-circle"></i> TOP UP
-                  </a>';
-        }
-        
-        echo '<span class="ml-4 d-none d-md-inline text-muted small border-left pl-3"><strong>Status:</strong> ' . $today_label . '</span>';
+        echo '<span class="mr-3"><strong>Credits:</strong> <span class="badge badge-pill badge-primary">' . $current_credits . '</span></span>';
+        echo '<span><strong>Status:</strong> <small class="text-muted ml-1">' . $today_label . '</small></span>';
     echo '</div>';
     
-    echo '<div class="d-flex align-items-center">';
-        // Admin Access
-        if (has_capability('moodle/site:config', context_system::instance())) {
-            echo '<a href="manage.php" class="btn btn-dark btn-sm font-weight-bold shadow-sm mr-2">
-                    <i class="fa fa-cog"></i> Control Center
-                  </a>';
-        }
-        // Action Button
-        if (!$is_enterprise && $current_credits > 0) {
-            echo '<a href="recovery.php" class="btn btn-success btn-sm shadow-sm px-3 font-weight-bold">
-                    <i class="fa fa-bolt"></i> Boost Performance
-                  </a>';
-        }
-    echo '</div>';
-    // The Unified Status & Action Bar
-echo '<div class="alert alert-info d-flex justify-content-between align-items-center shadow-sm mb-4" style="border-left: 5px solid #007bff; background-color: #f8fbff;">';
     echo '<div>';
-        echo '<span class="mr-3"><strong>Credits:</strong> <span class="badge badge-pill badge-primary" style="font-size: 1rem;">' . $current_credits . '</span></span>';
-        
-        // NEW: History Button
-        echo '<a href="history.php" class="btn btn-sm btn-link text-muted mr-3" title="View Transaction History">
-                <i class="fa fa-history"></i> History
-              </a>';
-
-        if (!$is_enterprise) {
-            echo '<a href="'.$buy_url.'" class="btn btn-sm btn-outline-primary font-weight-bold shadow-sm py-1">
-                    <i class="fa fa-plus-circle"></i> TOP UP
-                  </a>';
-        }
-        
-        echo '<span class="ml-4 d-none d-md-inline text-muted small border-left pl-3"><strong>Status:</strong> ' . $today_label . '</span>';
-    echo '</div>';
-    
-    echo '<div class="d-flex align-items-center">';
         if (has_capability('moodle/site:config', context_system::instance())) {
-            echo '<a href="manage.php" class="btn btn-dark btn-sm font-weight-bold shadow-sm mr-2">
+            echo '<a href="manage.php" class="btn btn-light btn-sm font-weight-bold shadow-sm">
                     <i class="fa fa-cog"></i> Control Center
                   </a>';
         }
         if (!$is_enterprise && $current_credits > 0) {
-            echo '<a href="recovery.php" class="btn btn-success btn-sm shadow-sm px-3 font-weight-bold">
-                    <i class="fa fa-bolt"></i> Boost Performance
-                  </a>';
+            echo '<a href="recovery.php" class="btn btn-success btn-sm shadow-sm ml-2"></a>';
         }
     echo '</div>';
-echo '</div>';
 echo '</div>';
 
 echo $renderer->render_from_template('local_chartplugin/custom_header', $template_data);

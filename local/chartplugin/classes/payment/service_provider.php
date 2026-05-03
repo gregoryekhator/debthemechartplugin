@@ -42,7 +42,26 @@ class service_provider implements service_provider_interface {
     /**
      * REQUIRED: What to do when the money is confirmed.
      */
-    public static function deliver_order(string $paymentarea, int $itemid, int $paymentid, int $userid): bool {
-        return \local_chartplugin\payment\processor::deliver_order_final($paymentarea, $itemid, $paymentid, $userid);
+    public static function deliver_order($paymentid, $userid, $amount, $currency, $itemid) {
+    global $DB;
+
+    // 1. Update the User's live balance in the main users table
+    $user_record = $DB->get_record('local_chartplugin_users', ['userid' => $userid]);
+    if ($user_record) {
+        // Increment credits based on the item purchased
+        $user_record->credits += 10; 
+        $DB->update_record('local_chartplugin_users', $user_record);
     }
+
+    // 2. Create the 'Receipt' record for the History view
+    $history = new \stdClass();
+    $history->userid = $userid;
+    $history->paymentid = $paymentid;
+    $history->amount = $amount;
+    $history->currency = $currency;
+    $history->itemid = $itemid;
+    $history->status = 'completed'; // Validates the purchase in history.php
+    $history->timecreated = time();
+    
+    return $DB->insert_record('local_chartplugin_payments', $history);
 }

@@ -1,4 +1,4 @@
-    <?php
+<?php
 require_once(__DIR__ . '/../../config.php');
 require_login();
 
@@ -14,15 +14,16 @@ $history = $DB->get_records('local_chartplugin_history', ['userid' => $USER->id]
 if (!$history) {
     echo $OUTPUT->notification("No transactions found.", 'info');
 } else {
-    echo "<table class='table'>";
-    echo "<thead><tr><th>Date</th><th>Item</th><th>Amount</th><th>Status</th></tr></thead><tbody>";
+    echo "<table class='table table-striped'>";
+    echo "<thead><tr><th>Date</th><th>Item</th><th>Amount</th><th>Action</th></tr></thead><tbody>";
     foreach ($history as $row) {
         $date = userdate($row->timecreated);
+        $receipturl = new moodle_url('/local/chartplugin/receipt.php', ['id' => $row->id]);
         echo "<tr>
                 <td>{$date}</td>
-                <td>{$row->itemid} Credits</td>
+                <td>{$row->itemid} Credits ({$row->type})</td>
                 <td>{$row->currency} {$row->amount}</td>
-                <td><span class='badge badge-success'>Completed</span></td>
+                <td><a href='{$receipturl}' class='btn btn-sm btn-primary'>View Receipt</a></td>
               </tr>";
     }
     echo "</tbody></table>";
