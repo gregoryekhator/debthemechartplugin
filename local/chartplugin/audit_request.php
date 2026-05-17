@@ -1,5 +1,17 @@
 <?php
 /**
+ * audit_request.php
+ *
+ * @package    local_chartplugin
+ * @copyright  2026 Debonair Training
+ * @author     Gregory Ekhator <greg_ekhator@yahoo.com>
+ * @company    Debonair Training Limited
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
  * Path: /var/www/html/moodle_test/local/chartplugin/audit_request.php
  */
 require_once(__DIR__ . '/../../config.php');
@@ -33,7 +45,7 @@ echo $OUTPUT->header();
 
         <div class="step d-none" id="step-3">
             <h2 class="font-weight-bold mb-4">Almost there! Your contact email?</h2>
-            <input type="email" id="user_email" class="form-control form-control-lg rounded-pill text-center" value="<?php echo $USER->email; ?>">
+            <input type="email" id="user_email" class="form-control form-control-lg rounded-pill text-center" value=" echo $USER->email; ?>">
             <button class="btn btn-success btn-lg rounded-pill mt-4 px-5" onclick="finish()">Submit Audit Request</button>
         </div>
 
@@ -66,4 +78,4 @@ function finish() {
 }
 </script>
 
-<?php echo $OUTPUT->footer(); ?>
+ echo $OUTPUT->footer(); ?>

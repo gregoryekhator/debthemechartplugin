@@ -1,5 +1,17 @@
 <?php
 /**
+ * manage.php
+ *
+ * @package    local_chartplugin
+ * @copyright  2026 Debonair Training
+ * @author     Gregory Ekhator <greg_ekhator@yahoo.com>
+ * @company    Debonair Training Limited
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
  * Path: /local/chartplugin/manage.php
  * Rebranded: Learning Dashboard Control Center with Search
  */
@@ -25,28 +37,22 @@ echo $OUTPUT->header();
 
 // --- 1. ACTION HANDLING ---
 if ($targetuserid) {
-    // Check local_chartplugin_payments for the credit record
-    $record = $DB->get_record('local_chartplugin_payments', ['userid' => $targetuserid]);
+    // We check local_chartplugin_users because that is our "source of truth" for balances
+    $record = $DB->get_record('local_chartplugin_users', ['userid' => $targetuserid]);
     
     if ($action === 'deactivate' && $record) {
-        $record->valid_until = time() - 3600; 
-        $DB->update_record('local_chartplugin_payments', $record);
-        echo $OUTPUT->notification("Access deactivated for User ID: $targetuserid", 'notifynotice');
+        $record->credits = 0; 
+        $DB->update_record('local_chartplugin_users', $record);
+        echo $OUTPUT->notification("Access deactivated (Credits set to 0) for User ID: $targetuserid", 'notifynotice');
     } else if ($newcredits !== null) {
         if ($record) {
             $record->credits = $newcredits;
-            // If they have 10+ credits, ensure they aren't 'expired'
-            if ($newcredits >= 10 && $record->valid_until < time()) {
-                $record->valid_until = time() + (365 * DAYSECS); 
-            }
-            $DB->update_record('local_chartplugin_payments', $record);
+            $DB->update_record('local_chartplugin_users', $record);
         } else {
             $newrecord = new stdClass();
             $newrecord->userid = $targetuserid;
             $newrecord->credits = $newcredits;
-            $newrecord->status = 'active';
-            $newrecord->valid_until = ($newcredits >= 10) ? time() + (365 * DAYSECS) : 0;
-            $DB->insert_record('local_chartplugin_payments', $newrecord);
+            $DB->insert_record('local_chartplugin_users', $newrecord);
         }
         echo $OUTPUT->notification("Balance updated to $newcredits for User ID: $targetuserid.", 'notifysuccess');
     }
@@ -61,19 +67,25 @@ echo '<form method="GET" class="form-inline">
       </form>';
 echo '</div>';
 
-// --- 3. SEARCH LOGIC ---
+// --- 3. SEARCH LOGIC & DATA FETCH ---
 $params = [];
-$wheresql = "u.deleted = 0";
+$wheresql = "u.deleted = 0 AND u.id > 1"; // Exclude guest
+
 if (!empty($search)) {
     $wheresql .= " AND (u.firstname LIKE :s1 OR u.lastname LIKE :s2 OR u.id = :s3)";
     $params['s1'] = $params['s2'] = "%$search%";
     $params['s3'] = (int)$search;
 }
 
-$sql = "SELECT u.id, u.firstname, u.lastname, p.credits, p.valid_until 
-        FROM {user} u 
-        LEFT JOIN {local_chartplugin_payments} p ON u.id = p.userid 
-        WHERE $wheresql ORDER BY u.lastname ASC LIMIT 50";
+// Use a unique ID (u.id) as the first column to prevent "Duplicate ID" errors
+$sql = "SELECT u.id, u.firstname, u.lastname, 
+               COALESCE(p.credits, 0) as credits
+        FROM {user} u
+        LEFT JOIN {local_chartplugin_users} p ON u.id = p.userid
+        WHERE $wheresql
+        ORDER BY u.lastname ASC";
+
+// CRITICAL: Actually execute the query to define $users
 $users = $DB->get_records_sql($sql, $params);
 
 // --- 4. RENDER TABLE ---
@@ -83,25 +95,31 @@ echo '<table class="table table-hover mt-3 shadow-sm" style="background: #fff; b
         </thead>
         <tbody>';
 
-foreach ($users as $u) {
-    $current = $u->credits ?? 0;
-    // Logical Boost: Active if balance > 0 OR Enterprise if credits >= 10
-    $is_active = ($current >= 10) || (!empty($u->valid_until) && $u->valid_until > time());
-    $status_badge = $is_active ? 'badge-success' : 'badge-secondary';
-    
-    echo "<tr>
-            <td><strong>$u->firstname $u->lastname</strong><br><small class='text-muted'>ID: $u->id</small></td>
-            <td><strong>$current</strong></td>
-            <td><span class='badge $status_badge'>" . ($is_active ? 'BOOST ACTIVE' : 'NO BOOST') . "</span></td>
-            <td>
-                <form method='POST' class='form-inline'>
-                    <input type='hidden' name='userid' value='$u->id'>
-                    <input type='number' name='credits' class='form-control form-control-sm mr-2' style='width:65px;' value='$current'>
-                    <button type='submit' name='action' value='update' class='btn btn-success btn-sm mr-1'>Update</button>
-                    <button type='submit' name='action' value='deactivate' class='btn btn-danger btn-sm'>Kill Access</button>
-                </form>
-            </td>
-          </tr>";
+if (!empty($users)) {
+    foreach ($users as $u) {
+        $current = $u->credits ?? 0;
+        
+        // Logical Boost: Enterprise if credits > 0
+        $is_active = ($current > 0);
+        $status_badge = $is_active ? 'badge-success' : 'badge-secondary';
+        
+        echo "<tr>
+                <td><strong>$u->firstname $u->lastname</strong><br><small class='text-muted'>ID: $u->id</small></td>
+                <td><strong>$current</strong></td>
+                <td><span class='badge $status_badge'>" . ($is_active ? 'ENTERPRISE' : 'FREEMIUM') . "</span></td>
+                <td>
+                    <form method='POST' class='form-inline'>
+                        <input type='hidden' name='userid' value='$u->id'>
+                        <input type='number' name='credits' class='form-control form-control-sm mr-2' style='width:65px;' value='$current'>
+                        <button type='submit' name='action' value='update' class='btn btn-success btn-sm mr-1'>Update</button>
+                        <button type='submit' name='action' value='deactivate' class='btn btn-danger btn-sm'>Kill Access</button>
+                    </form>
+                </td>
+              </tr>";
+    }
+} else {
+    echo "<tr><td colspan='4' class='text-center'>No users found matching criteria.</td></tr>";
 }
+
 echo '</tbody></table>';
 echo $OUTPUT->footer();

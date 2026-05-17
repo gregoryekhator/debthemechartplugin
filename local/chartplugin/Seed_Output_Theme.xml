@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="description">
+    <name><text>11. Lesson 3.1: Output API - Core Renderers &amp; Component Factory Engines</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: Output API & Render Engine Blueprinting]
+
+    [NARRATIVE: Slide Bullet Points:
+    • THE METAPHOR: The Structural Architect. If data is raw concrete, the output renderer is the blueprint shaping it into an estate.
+    • OOP INITIALIZATION: Instantiated via the global PAGE object output rendering factory manager.
+    • COMMON USAGE: Abstracting dirty HTML strings out of plugin business logic files into reusable rendering components.
+    • DEMO PROBLEM: A developer echo-prints raw tables directly inside a script loop, making the layout impossible to customize or override.
+    • CODE SOLUTION: Define an explicit custom plugin renderer class, move markup blocks into clean engine methods, and return standard renderable objects.
+    • CORE VALIDATION, ASSIGNMENT & REFERENCES: Refactor an existing raw output block so it leverages a custom mustache template structure. Reference: Output API Documentation inside lib/outputlib.php.
+
+    Voiceover Script:
+    Welcome to the Moodle Output API. Think of your business logic as an engine, and the Output API as the car body built around it. We never want to mix raw SQL processing or validation logic with direct HTML layout strings. By routing all visual elements through core renderer objects, we establish strict architectural isolation, making our plugin code modular, clean, and completely open to downstream modifications.]
+    ]]></text></questiontext>
+  </question>
+
+  <question type="description">
+    <name><text>12. Lesson 3.2: Theme API - Renderers Overrides &amp; CSS Layout Facades</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: Theme API & Custom Render Overrides]
+
+    [NARRATIVE: Slide Bullet Points:
+    • THE METAPHOR: The House Facade. The core output component builds the rooms, but the theme swaps the paint, lighting, and textures instantly.
+    • OOP INITIALIZATION: Governed dynamically by the theme configuration metadata layout layer.
+    • COMMON USAGE: Intercepting core plugin output components to inject custom branding or tailored responsive behaviors.
+    • DEMO PROBLEM: A core site update modifies a generic block layout, accidentally breaking a plugin's strict CSS target dependencies.
+    • CODE SOLUTION: Create a theme override directory, mirror the target plugin namespace structure, and implement a custom renderer override function.
+    • CORE VALIDATION, ASSIGNMENT & REFERENCES: Register a custom theme style configuration array that hooks into and alters the layout behavior of a standard system navigation bar. Reference: Moodle Themes Developer Guide.
+
+    Voiceover Script:
+    The Theme API gives you absolute visual authority over your application ecosystem without editing core files. By understanding renderer overrides, you can intercept the HTML produced by any plugin on your system and rewrite its layout structure directly within your theme layer. It is the ultimate facade swap—allowing the base system to function identically while providing a customized, responsive experience.]
+    ]]></text></questiontext>
+  </question>
+
+</quiz>

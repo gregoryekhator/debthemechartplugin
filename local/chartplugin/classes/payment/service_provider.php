@@ -1,5 +1,17 @@
 <?php
 /**
+ * service_provider.php
+ *
+ * @package    local_chartplugin
+ * @copyright  2026 Debonair Training
+ * @author     Gregory Ekhator <greg_ekhator@yahoo.com>
+ * @company    Debonair Training Limited
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
  * Path: /local/chartplugin/classes/payment/service_provider.php
  * Purpose: Fulfills all Moodle 4.5 Interface requirements
  */
@@ -26,42 +38,43 @@ class service_provider implements service_provider_interface {
         ];
         
         $amount = $prices[$itemid] ?? 0.00;
-        $accountid = 2; // Your "Moodle Chart Plugin" account ID
 
-        return new payable($amount, 'USD', $accountid);
+        return new payable(
+            (string)$amount,
+            'USD',
+            "Purchase {$itemid} Learning Credits",
+            $itemid
+        );
     }
 
     /**
-     * REQUIRED: Where to send the user after a successful purchase.
+     * REQUIRED: Delivers the credits after successful payment.
      */
-    public static function get_success_url(string $paymentarea, int $itemid): moodle_url {
-        // Send them back to the Learning Dashboard
-        return new moodle_url('/local/chartplugin/index.php', ['status' => 'success']);
+    public static function deliver_order(string $paymentarea, int $itemid, int $paymentid, int $userid): bool {
+        global $DB;
+
+        if ($paymentarea !== 'credits') {
+            return false;
+        }
+
+        $userfield = $DB->get_record('user_info_field', ['shortname' => 'credits']);
+        if (!$userfield) {
+            return false;
+        }
+
+        $current = $DB->get_record('user_info_data', ['userid' => $userid, 'fieldid' => $userfield->id]);
+        $newbalance = ($current ? (int)$current->data : 0) + (int)$itemid;
+
+        if ($current) {
+            $DB->set_field('user_info_data', 'data', (string)$newbalance, ['id' => $current->id]);
+        } else {
+            $DB->insert_record('user_info_data', [
+                'userid' => $userid, 
+                'fieldid' => $userfield->id, 
+                'data' => (string)$newbalance
+            ]);
+        }
+
+        return true;
     }
-
-    /**
-     * REQUIRED: What to do when the money is confirmed.
-     */
-    public static function deliver_order($paymentid, $userid, $amount, $currency, $itemid) {
-    global $DB;
-
-    // 1. Update the User's live balance in the main users table
-    $user_record = $DB->get_record('local_chartplugin_users', ['userid' => $userid]);
-    if ($user_record) {
-        // Increment credits based on the item purchased
-        $user_record->credits += 10; 
-        $DB->update_record('local_chartplugin_users', $user_record);
-    }
-
-    // 2. Create the 'Receipt' record for the History view
-    $history = new \stdClass();
-    $history->userid = $userid;
-    $history->paymentid = $paymentid;
-    $history->amount = $amount;
-    $history->currency = $currency;
-    $history->itemid = $itemid;
-    $history->status = 'completed'; // Validates the purchase in history.php
-    $history->timecreated = time();
-    
-    return $DB->insert_record('local_chartplugin_payments', $history);
 }

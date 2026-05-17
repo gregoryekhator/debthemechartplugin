@@ -1,4 +1,16 @@
 <?php
+/**
+ * phase1b_add_questions_to_quizzes.php
+ *
+ * @package    local_chartplugin
+ * @copyright  2026 Debonair Training
+ * @author     Gregory Ekhator <greg_ekhator@yahoo.com>
+ * @company    Debonair Training Limited
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
 // Phase 1B-3.3: Add baseline questions to analytics quizzes
 // Canonical, schema-safe version.
 

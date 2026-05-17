@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="description">
+    <name><text>13. Lesson 3.3: Output API - Mustache Templates &amp; Content Blueprints</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: Mustache Engine & HTML Blueprints]
+
+    [NARRATIVE: Slide Bullet Points:
+    • THE METAPHOR: The Pre-Fabricated Wall Mold. The renderer supplies the raw materials, but the Mustache file is the rigid mold that guarantees every wall looks identical.
+    • OOP INITIALIZATION: Rendered via the core output renderer render_from_template method.
+    • COMMON USAGE: Separating frontend HTML structure entirely from backend PHP data collection.
+    • DEMO PROBLEM: A designer wants to modernize a custom block, but the markup is trapped inside complex PHP logic loops.
+    • CODE SOLUTION: Extract HTML structures into a standalone .mustache file and pass data arrays as simple JSON-like context structures.
+    • CORE VALIDATION, ASSIGNMENT & REFERENCES: Build a reusable Mustache card layout that loops through an array of course metrics safely. Reference: Moodle Templates Developer Docs.
+
+    Voiceover Script:
+    Mustache templates are the pre-fabricated structures of modern Moodle development. By stripping all PHP logic away from your layout templates, you empower frontend designers to safely modify look and feel without risking application crashes. Your PHP code simply gathers the data cargo, bundles it up, and drops it into the template mold to be cast instantly.]
+    ]]></text></questiontext>
+  </question>
+
+  <question type="description">
+    <name><text>14. Lesson 3.4: Theme API - Renderable Objects &amp; Data Cargo Packages</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: Renderable Interfaces & Data Passing]
+
+    [NARRATIVE: Slide Bullet Points:
+    • THE METAPHOR: The Specialized Shipping Container. You cannot dump loose items onto a ship; you lock them into standard cargo crates that any port crane knows how to handle.
+    • OOP INITIALIZATION: Implements the core renderable and templatable interface standards.
+    • COMMON USAGE: Packaging multi-layered database payloads into highly structured, immutable view-model objects.
+    • DEMO PROBLEM: A custom plugin passes loose, unvalidated multi-dimensional arrays to a renderer, causing unpredictable rendering exceptions.
+    • CODE SOLUTION: Create an explicit class that implements renderable, map input parameters inside the constructor, and provide an export_for_template data formatting method.
+    • CORE VALIDATION, ASSIGNMENT & REFERENCES: Enforce strict type-hinting on a custom dashboard widget object to reject malformed dataset structures. Reference: lib/outputlib.php.
+
+    Voiceover Script:
+    Standardizing how data travels to the presentation layer is critical for scaling large applications. Implement the renderable interface on your data objects to convert them into secure shipping containers. The theme engine doesn't need to guess the structure of your data payload—it relies on standard, type-hinted export methods to cleanly extract exactly what it needs for rendering.]
+    ]]></text></questiontext>
+  </question>
+
+</quiz>

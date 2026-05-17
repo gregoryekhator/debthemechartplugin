@@ -1,4 +1,16 @@
 <?php
+/**
+ * phase1c_aggregate_grades.php
+ *
+ * @package    local_chartplugin
+ * @copyright  2026 Debonair Training
+ * @author     Gregory Ekhator <greg_ekhator@yahoo.com>
+ * @company    Debonair Training Limited
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
 // Phase 1C-2: Aggregate Analytics Grades (Authoritative DML)
 
 define('CLI_SCRIPT', true);

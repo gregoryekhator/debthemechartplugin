@@ -1,157 +1,96 @@
-<div class="chartplugin-content mx-5 pb-5">
-    {{! AI HERO }}
-    <div class="alert bg-white shadow-sm d-flex justify-content-between align-items-center my-4 p-3 deb-ai-hero" style="border-left: 6px solid #ff002d; border-radius: 15px;">
-        <div class="h6 mb-0 font-weight-bold text-dark">
-            <i class="fa fa-graduation-cap mr-2 text-primary"></i>Study Status: {{{ai_hero_text}}}
-        </div>
-        <a href="recovery.php" class="btn btn-success px-4 rounded-pill font-weight-bold shadow-sm">Boost Performance</a>
-    </div>
-
-    {{! MAIN CHART CARD }}
-<div class="card p-4 shadow-sm border-0 deb-chart-card" style="border-radius: 25px; margin-bottom: 20px; position: relative; z-index: 10; background: #fff;">
-    <div class="d-flex justify-content-between align-items-start mb-4">
-        <div>
-            <h3 class="font-weight-bold mb-0 text-dark">{{chart_title}}</h3>
-            <p class="small text-muted mb-0">{{chart_tooltip}}</p>
-        </div>
-        <div class="btn-group shadow-sm">
-            <a href="?type={{current_type}}&format=bar" class="btn btn-sm btn-outline-primary {{#is_bar}}active{{/is_bar}}">Bar</a>
-            <a href="?type={{current_type}}&format=line" class="btn btn-sm btn-outline-primary {{#is_line}}active{{/is_line}}">Line</a>
-            <a href="?type={{current_type}}&format=pie" class="btn btn-sm btn-outline-primary {{#is_pie}}active{{/is_pie}}">Pie</a>
-        </div>
-    </div>
+<div class="chartplugin-container pb-5" style="background-color: #f4f7f6; min-height: 100vh; padding: 20px;">
     
-    <div class="chart-render-container" style="min-height: 400px; width: 100%; background: #fff;">
-        {{{main_chart_html}}}
+    {{! HEADER NAVIGATION }}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info d-flex justify-content-between align-items-center shadow-sm" style="border-radius: 15px; border-left: 6px solid #007bff;">
+                <div>
+                    <span class="mr-3"><strong>Credits:</strong> <span class="badge badge-pill badge-primary">{{current_credits}}</span></span>
+                    <span><strong>Status:</strong> <small class="text-muted">{{today_label}}</small></span>
+                </div>
+                <div>
+                    {{#is_admin}}
+                        <a href="manage.php" class="btn btn-dark btn-sm rounded-pill px-3 mr-2"><i class="fa fa-cog"></i> Admin</a>
+                    {{/is_admin}}
+                    <a href="buy.php" class="btn btn-success btn-sm rounded-pill px-3">Add Credits</a>
+                </div>
+            </div>
         </div>
-
-        {{! Custom CSS to fix the Moodle Table overlap }}
-        <style>
-            .chart-render-container .chart-table-expandable {
-                background: #ffffff !important;
-                border: 1px solid #dee2e6;
-                border-radius: 10px;
-                margin-top: 20px;
-                padding: 15px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-                position: relative;
-                z-index: 20;
-            } 
-        </style>
     </div>
 
-{{! Spacer to ensure the historical row doesn't get crushed }}
-<div style="height: 25px;"></div>
-
-    {{! COCKPIT ROW - Historical & AI Analyst }}
-    <div class="row mb-5 deb-historical-row" style="margin-top: 60px;">
-        {{! LAST ANALYSIS }}
-        <div class="col-md-3">
-            <div class="bg-white p-3 shadow-sm border" style="border-radius: 20px; height: 550px; overflow: hidden;">
-                <p class="small font-weight-bold text-primary mb-1 text-uppercase">Last Analysis</p>
-                <p class="small font-weight-bold text-dark">{{last_viewed.title}}</p>
-                <hr>
-                <div style="height: 400px;">
-                    {{{last_viewed.html}}}
-                </div>
-            </div>
-        </div>
-
-        {{! PREVIOUS ANALYSIS }}
-        <div class="col-md-3">
-            <div class="bg-white p-3 shadow-sm border" style="border-radius: 20px; height: 550px; overflow: hidden;">
-                <p class="small font-weight-bold text-primary mb-1 text-uppercase">Previous Analysis</p>
-                <p class="small font-weight-bold text-dark">{{prev_viewed.title}}</p>
-                <hr>
-                <div style="height: 400px;">
-                    {{{prev_viewed.html}}}
-                </div>
-            </div>
-        </div>
-        
-        {{! AI ANALYST - THE SMART LOCK }}
-        <div class="col-md-6">
-            <div class="card h-100 deb-ai-analyst-card" style="border-radius: 20px; min-height: 550px; border: 5px solid #007bff !important; box-shadow: 0 20px 40px rgba(0, 31, 63, 0.25) !important;">
-                <div class="card-header text-white text-center py-2" style="background: #007bff; border-radius: 12px 12px 0 0;">
-                    <span class="small font-weight-bold" style="letter-spacing: 2px;">AI ANALYST</span>
-                </div>
-                <div class="card-body d-flex flex-column p-3">
-                    <div id="ai-chat-box" style="flex-grow:1; overflow-y: auto; padding: 10px; background: #ffffff;">
-                        
-                        {{#is_enterprise}}
-                        {{! UNLOCKED STATE }}
-                        <div class="mb-3">
-                            <div class="d-inline-block p-3 rounded shadow-sm bg-light text-dark" style="max-width: 85%; border-radius: 15px 15px 15px 0px !important; border-left: 4px solid #007bff;">
-                                Analyzing **{{chart_title}}**. I've identified the best topics for you to study to climb the leaderboard. What is your goal for this week?
-                            </div>
-                        </div>
-                        {{/is_enterprise}}
-
-                        {{^is_enterprise}}
-                        {{! LOCKED STATE }}
-                        <div class="text-center my-auto p-5">
-                            <div class="mb-4">
-                                <i class="fa fa-lock fa-4x text-muted opacity-50"></i>
-                            </div>
-                            <h4 class="font-weight-bold text-dark">Insights Locked</h4>
-                            <p class="text-muted small px-3">To see your grade predictions and hidden study gaps for **{{chart_title}}**, boost your performance below.</p>
-                            <a href="recovery.php" class="btn btn-primary rounded-pill px-4 mt-3 shadow-sm">Unlock AI Analyst</a>
-                        </div>
-                        {{/is_enterprise}}
-
+    {{! MAIN ROW: CHART & AI MINER }}
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 20px; overflow: hidden;">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="font-weight-bold mb-0 text-dark">{{chart_title}}</h4>
+                        <p class="small text-muted">{{chart_tooltip}}</p>
                     </div>
+                    {{! RESTORED TOGGLE BUTTONS }}
+                    <div class="btn-group shadow-sm" style="border-radius: 10px; overflow: hidden;">
+                        <a href="?type={{current_type}}&format=bar" class="btn btn-sm btn-outline-primary {{#is_bar}}active{{/is_bar}}">Bar</a>
+                        <a href="?type={{current_type}}&format=line" class="btn btn-sm btn-outline-primary {{#is_line}}active{{/is_line}}">Line</a>
+                        <a href="?type={{current_type}}&format=pie" class="btn btn-sm btn-outline-primary {{#is_pie}}active{{/is_pie}}">Pie</a>
+                    </div>
+                </div>
+                <div class="card-body" style="min-height: 450px;">
+                    {{{main_chart_html}}}
+                </div>
+            </div>
+        </div>
 
+        {{! AI MINER PANEL }}
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm h-100 border-0" style="border-radius: 20px; background: linear-gradient(to bottom, #ffffff, #f0f7ff);">
+                <div class="card-header bg-primary text-white text-center py-3" style="border-radius: 20px 20px 0 0;">
+                    <strong><i class="fa fa-microchip mr-2"></i>AI PREDICTIVE MINER</strong>
+                </div>
+                <div class="card-body d-flex flex-column justify-content-center">
                     {{#is_enterprise}}
-                    {{! INPUT GROUP - ONLY VISIBLE WHEN UNLOCKED }}
-                    <div class="mt-2 pt-2 border-top">
-                        <div class="input-group bg-white rounded-pill p-1 shadow-sm border">
-                            <input type="text" id="ai-user-q" class="form-control border-0 bg-transparent px-3" 
-                                   placeholder="Ask how to improve your score..." 
-                                   onkeypress="if(event.key === 'Enter') triggerAI()">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary rounded-circle" onclick="triggerAI()" style="width: 40px; height: 40px;">
-                                    <i class="fa fa-paper-plane"></i>
-                                </button>
-                            </div>
+                        <div class="ai-chat-interface p-3 bg-white rounded shadow-sm mb-3" style="height: 300px; border: 1px solid #e3e6f0;">
+                            <p class="small text-info text-center">AI System Online</p>
                         </div>
-                    </div>
+                        <div class="input-group">
+                            <button class="btn btn-outline-primary rounded-circle mr-2"><i class="fa fa-microphone"></i></button>
+                            <input type="text" class="form-control rounded-pill" placeholder="Analyze patterns...">
+                        </div>
+                    {{/is_enterprise}}
+                    {{^is_enterprise}}
+                        <div class="text-center p-4">
+                            <i class="fa fa-lock fa-4x text-muted mb-3"></i>
+                            <h5>Insights Restricted</h5>
+                            <p class="text-muted small">The Predictive Miner requires an Enterprise license.</p>
+                            <a href="buy.php" class="btn btn-primary btn-block rounded-pill font-weight-bold shadow">UPGRADE NOW</a>
+                        </div>
                     {{/is_enterprise}}
                 </div>
             </div>
         </div>
     </div>
 
-    {{! DEEP DIVE CTA }}
-    <div class="cta-container text-center p-5 mb-5 bg-white shadow-sm border mt-5" style="border-radius: 30px;">
-        <h3 class="font-weight-bold text-dark">Need a Specialized Deep Dive?</h3>
-        <p class="text-muted mx-auto" style="max-width: 600px;">Request a bespoke audit of your team's cognitive telemetry via our priority assessment desk.</p>
-        <button class="btn btn-primary rounded-pill px-5 shadow-sm" onclick="window.location.href='audit_request.php'">
-            Request Audit
-        </button>
+    {{! SECOND ROW: SNAPSHOTS & PERFORMANCE BOOST }}
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-0 p-3 h-100" style="border-radius: 20px;">
+                <h6 class="text-primary font-weight-bold">LAST ANALYSIS</h6>
+                <div class="chart-snapshot" style="height: 200px;">{{{last_viewed.html}}}</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-0 p-3 h-100" style="border-radius: 20px;">
+                <h6 class="text-primary font-weight-bold">PREVIOUS VIEW</h6>
+                <div class="chart-snapshot" style="height: 200px;">{{{prev_viewed.html}}}</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            {{! PERFORMANCE BOOST BOX }}
+            <div class="card shadow-sm border-0 h-100 text-center p-4" style="border-radius: 20px; background: linear-gradient(135deg, #1cc88a, #13855c); color: white;">
+                <i class="fa fa-bolt fa-3x mb-3"></i>
+                <h5 class="font-weight-bold">Performance Boost</h5>
+                <p class="small mb-4 text-white-50">Generate an AI-driven learning path instantly.</p>
+                <a href="process_boost.php?sesskey={{sesskey}}" class="btn btn-light btn-block rounded-pill text-success font-weight-bold">BOOST NOW</a>
+            </div>
+        </div>
     </div>
 </div>
-
-<script>
-function triggerAI() {
-    const input = document.getElementById('ai-user-q');
-    const box = document.getElementById('ai-chat-box');
-    if (!input || !box || input.value.trim() === "") return;
-    
-    const q = input.value;
-    input.value = "";
-    
-    // User bubble (Navy Blue)
-    box.innerHTML += `<div class="mb-3 text-right"><div class="d-inline-block p-2 rounded text-white shadow-sm" style="background: #001f3f; max-width: 85%; border-radius: 15px 15px 0px 15px !important;">${q}</div></div>`;
-    
-    // AI Analyst response (Friendly Student-Centric Voice)
-    setTimeout(() => {
-        box.innerHTML += `
-            <div class="mb-3">
-                <div class="d-inline-block p-3 rounded shadow-sm bg-white text-dark" style="max-width: 85%; border-radius: 15px 15px 15px 0px !important; border-left: 4px solid #28a745;">
-                    <strong>AI Analyst:</strong> Looking at the **{{chart_title}}** data, you're on a great path! If you spend an extra 15 minutes on the areas where the chart dips, you'll likely see a 10-15 point boost in your next assessment. Should I list those topics for you?
-                </div>
-            </div>`;
-        box.scrollTop = box.scrollHeight;
-    }, 750);
-}
-</script>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="description">
+    <name><text>15. Lesson 3.5: [DEPLOY: ACTIVE] Output API - Pix &amp; Core Image Assets</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: Pix Engine Asset Delivery]
+
+    [NARRATIVE: Slide Bullet Points:
+    • THE METAPHOR: The Interior Wall Decor. The renderer builds the wall structure, but the pix engine dynamically selects and hangs the correct picture frame depending on the sub-theme.
+    • OOP INITIALIZATION: Resolved via the core output renderer image_url method locator.
+    • COMMON USAGE: Serving cached, responsive interface icons and branding SVGs dynamically across different theme styles.
+    • DEMO PROBLEM: A developer hardcodes a direct path to an image file, causing broken image links when a custom theme overrides the skin.
+    • CODE SOLUTION: Route all image source bindings through the standard core output image_url helper engine.
+    • CORE VALIDATION, ASSIGNMENT & REFERENCES: Inject an SVG icon asset into a custom block namespace header using clean path maps. Reference: lib/outputlib.php.
+
+    Voiceover Script:
+    Welcome back to the presentation track. Hardcoding visual assets is an absolute anti-pattern in scalable systems. Moodle’s Pix engine acts as a dynamic art curator. By registering asset calls through the core output image engine instead of raw files paths, the system automatically checks if the active theme provides a custom variation of that graphic, swapping it seamlessly to fit the user's design scheme.]
+    ]]></text></questiontext>
+  </question>
+
+  <question type="description">
+    <name><text>16. Lesson 3.6: [DEPLOY: ACTIVE] Theme API - User Agent &amp; Device Layout Tunnels</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: Device Detection Layout Routing]
+
+    [NARRATIVE: Slide Bullet Points:
+    • THE METAPHOR: The Smart Adaptive Entryway. A building that detects who is walking up and morphs its doors instantly to accommodate a wheelchair, a truck, or a pedestrian.
+    • OOP INITIALIZATION: Evaluated dynamically by the global PAGE object device detection wrappers.
+    • COMMON USAGE: Serving custom lightweight layouts for mobile applications while reserving heavy interfaces for desktop environments.
+    • DEMO PROBLEM: A dense multi-column reporting dashboard breaks layout completely when viewed on standard smartphone screen viewports.
+    • CODE SOLUTION: Establish conditional layout routing blocks inside your theme configuration script based on the device configuration array status.
+    • CORE VALIDATION, ASSIGNMENT & REFERENCES: Set up an explicit design rule that forces an alternate layout template choice when a mobile browser profile is detected. Reference: Theme Layout Styles Guide.
+
+    Voiceover Script:
+    The target viewport changes everything about layout delivery. Moodle's theme architecture features built-in device detection tunnels. By setting explicit layout configurations based on the inbound device state, your theme can switch templates entirely under the hood—ensuring tablet, mobile, and desktop users see layouts custom-tailored to their specific screen real estate.]
+    ]]></text></questiontext>
+  </question>
+
+  <question type="description">
+    <name><text>17. Lesson 3.7: [DEPLOY: DRAFT] Output API - Experimental CSS Injection Methods</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: Experimental CSS Pipelines]
+
+    [NARRATIVE: Slide Bullet Points:
+    • THE METAPHOR: The Temporary Graffiti Wall. Spraying paint directly onto a localized structure without modifying the architectural blueprints of the building.
+    • STATUS: This is a draft sandbox module. It will be ignored by the compiler.
+    • CODE SOLUTION: Testing local inline styles manipulation matrices inside non-production extensions.
+
+    Voiceover Script:
+    This block is currently flagged as a deployment sandbox draft asset. The compiler will completely ignore this slide text string during bulk processing operations until its deployment tag is flipped to active status.]
+    ]]></text></questiontext>
+  </question>
+
+  <question type="description">
+    <name><text>18. Lesson 3.8: [DEPLOY: DRAFT] Theme API - Legacy Color Scheme Post-Processors</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: Deprecated CSS Parsing Modules]
+
+    [NARRATIVE: Slide Bullet Points:
+    • THE METAPHOR: The Outdated Plumbing Stack. A system layer left intact for old connections but bypassed by modern infrastructure.
+    • STATUS: This is a draft sandbox module. It will be ignored by the compiler.
+    • CODE SOLUTION: Reviewing legacy CSS processing variables for retrofitting backward-compatible system frameworks.
+
+    Voiceover Script:
+    This content remains hidden from production builds. It represents architectural research items that sit quietly inside the question bank database repository without taking up structural space on the compiled presentation slide deck.]
+    ]]></text></questiontext>
+  </question>
+
+</quiz>

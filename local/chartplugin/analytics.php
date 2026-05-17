@@ -1,4 +1,16 @@
 <?php
+/**
+ * analytics.php
+ *
+ * @package    local_chartplugin
+ * @copyright  2026 Debonair Training
+ * @author     Gregory Ekhator <greg_ekhator@yahoo.com>
+ * @company    Debonair Training Limited
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
 declare(strict_types=1);
 
 use core\chart_bar;
@@ -47,7 +59,7 @@ echo $OUTPUT->header();
         <div class="generalbox">
             <h3 id="chart-title">Synopsis (to date)</h3>
 
-            <?php
+            
             $sql = "
                 SELECT c.shortname, s.avggrade
                   FROM {local_chartplugin_course_stats} s
@@ -114,5 +126,5 @@ echo $OUTPUT->header();
     </div>
 </div>
 
-<?php
+
 echo $OUTPUT->footer();

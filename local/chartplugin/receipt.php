@@ -1,5 +1,17 @@
 <?php
 /**
+ * receipt.php
+ *
+ * @package    local_chartplugin
+ * @copyright  2026 Debonair Training
+ * @author     Gregory Ekhator <greg_ekhator@yahoo.com>
+ * @company    Debonair Training Limited
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
  * Path: /local/chartplugin/receipt.php
  */
 require_once(__DIR__ . '/../../config.php');
@@ -23,7 +35,7 @@ echo $OUTPUT->header();
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white d-flex justify-content-between">
             <h4 class="mb-0">Official Receipt</h4>
-            <span>#<?php echo $record->id; ?></span>
+            <span># echo $record->id; ?></span>
         </div>
         <div class="card-body">
             <div class="row mb-4">
@@ -35,8 +47,8 @@ echo $OUTPUT->header();
                 </div>
                 <div class="col-sm-6">
                     <h6 class="mb-3">To:</h6>
-                    <div><strong><?php echo fullname($USER); ?></strong></div>
-                    <div><?php echo $USER->email; ?></div>
+                    <div><strong> echo fullname($USER); ?></strong></div>
+                    <div> echo $USER->email; ?></div>
                 </div>
             </div>
 
@@ -53,9 +65,9 @@ echo $OUTPUT->header();
                     <tbody>
                         <tr>
                             <td>Learning Credits / AI Performance Boost</td>
-                            <td class="right"><?php echo ucfirst($record->type); ?></td>
-                            <td class="center"><?php echo userdate($record->timecreated); ?></td>
-                            <td class="right"><strong><?php echo $record->amount . ' ' . $record->currency; ?></strong></td>
+                            <td class="right"> echo ucfirst($record->type); ?></td>
+                            <td class="center"> echo userdate($record->timecreated); ?></td>
+                            <td class="right"><strong> echo $record->amount . ' ' . $record->currency; ?></strong></td>
                         </tr>
                     </tbody>
                 </table>
@@ -70,5 +82,5 @@ echo $OUTPUT->header();
     </div>
 </div>
 
-<?php
+
 echo $OUTPUT->footer();

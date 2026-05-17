@@ -1,4 +1,16 @@
 <?php
+/**
+ * phase1b_create_baseline_questions.php
+ *
+ * @package    local_chartplugin
+ * @copyright  2026 Debonair Training
+ * @author     Gregory Ekhator <greg_ekhator@yahoo.com>
+ * @company    Debonair Training Limited
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
 // Phase 1B-3.2: Create baseline questions correctly (Moodle 4.x compliant).
 
 define('CLI_SCRIPT', true);

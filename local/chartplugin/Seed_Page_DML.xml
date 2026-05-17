@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="description">
+    <name><text>01. Lesson 1.1: The PAGE API - Layout State Engine</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: The PAGE API State Architecture]
+
+    [NARRATIVE: Slide Bullet Points:
+    • DEFINITION: Central manager for the active page state, handling headings, contexts, and asset hooks.
+    • OOP INITIALIZATION: Interacts directly with the global $PAGE object instance.
+    • SECURITY BOUNDARY: $PAGE->set_context(context_system::instance());
+    • STATE MUTATION: $PAGE->set_heading("Welcome to ThemeAPI Masterclass");
+    • LAYOUT OVERRIDE: $PAGE->add_body_class('themeapi-custom-view');
+    • TROUBLESHOOTING: Call set_context() before rendering output to ensure classes populate in body_attributes().
+    • ROADMAP STRATEGY: Use conditional DML parameters to append behavioral classes like status-lockdown.
+
+    Voiceover Script:
+    Welcome to the structural foundation of Moodle application development. The Page API manages the comprehensive state of your rendering request. By explicitly calling the global PAGE object, setting its security context boundary, and mutating heading and class properties, we build a predictable canvas for our custom layouts and themes to sit on top of.]
+    ]]></text></questiontext>
+  </question>
+
+  <question type="description">
+    <name><text>02. Lesson 1.2: The DML API - Single-Metric Optimization</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: DML API - Dashboard Counter Optimization]
+
+    [NARRATIVE: Slide Bullet Points:
+    • DATABASE LAYER: Abstracted communication engine used to process safe records interaction.
+    • LATENCY RISK: Trainees frequently extract large record arrays into memory simply to calculate counts.
+    • OPTIMIZED AGGREGATE SQL: $sql = "SELECT COUNT(id) FROM {user_enrolments} WHERE userid = :userid";
+    • LOW-OVERHEAD FIELD FETCH: $enrollment_count = $DB->get_field_sql($sql, ['userid' => $USER->id]);
+    • PRESENTATION APPLICATION: Delivers a clean, tiny integer footprint directly to mustache engine loops.
+
+    Voiceover Script:
+    Data efficiency dictates performance at scale. When rendering single metrics on a user dashboard header, bypass heavy multi-column lookups. Use the database manipulation layer to run counting aggregates natively inside the database, keeping memory consumption low and server responses lightning fast.]
+    ]]></text></questiontext>
+  </question>
+
+  <question type="description">
+    <name><text>03. Lesson 1.3: The DML API - Analytical Data Restructuring</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: DML API - Formatted Analytical Queries]
+
+    [NARRATIVE: Slide Bullet Points:
+    • READ-MODEL TUNING: Swap multi-row object loops for key-value array menu maps.
+    • ASSOCIATIVE EXTRACTION: $data = $DB->get_records_menu_sql($optimized_sql, $params);
+    • TRANSFORMATION: Sort metrics with arsort($data) to preserve structural keys natively.
+    • FOOTPRINT PACKING: Round floats to uniform limits directly using round($user_avg, 1);
+    • DATA INTEGRITY SANITIZATION: Force rigid exclusions using explicit statements like AND finalgrade IS NOT NULL.
+    • ADVANCED TANGENT: Feed json-encoded associative arrays straight to AMD frontend Chart.js components.
+
+    Voiceover Script:
+    Data preparation is the core differentiator of high-performance analytics engines. By swapping multi-row structures for menu-driven associative reads, filtering empty null entries, and rounding decimal limits inside the query execution phase, your background engine feeds presentation charts clean, lightweight payloads without generating code execution bottlenecks.]
+    ]]></text></questiontext>
+  </question>
+
+  <question type="description">
+    <name><text>04. Lesson 1.4: The DML API - Exception Architectures</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: DML Exception Management]
+
+    [NARRATIVE: Slide Bullet Points:
+    • DEFENSIVE PATTERNS: Isolate structural execution points to intercept fatal application halts.
+    • VALIDATION BOUNDARY: Use the MUST_EXIST constraint flag within query lookups.
+    • TRY-CATCH INTERCEPTION: try { $record = $DB->get_record('quiz', ['id' => $quizid], '*', MUST_EXIST); } catch (dml_missing_record_exception $e) { meta_log_incident($e->getMessage()); }
+    • DIAGNOSTIC ERROR CAUSE: dmlreadexception highlights schema discrepancies such as missing dictionary fields.
+
+    Voiceover Script:
+    Defensive coding relies on handling explicit errors. Moodle protects database interactions through validation layers. When you request rows using strict structural flags, the engine throws targeted missing-record exceptions if data isn't there, allowing you to intercept failures smoothly before they break the user interface.]
+    ]]></text></questiontext>
+  </question>
+
+  <question type="description">
+    <name><text>05. Lesson 1.5: The DML API - Multi-Table Complex Analytical Joins</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: Multi-Table DML Joins]
+
+    [NARRATIVE: Slide Bullet Points:
+    • ARCHITECTURAL CROSS-OVERS: Connect data profiles across course, item, and grade tables.
+    • PERFORMANCE JOINS: SELECT c.id, c.fullname, ROUND(AVG(gg.finalgrade), 2) as score FROM {course} c JOIN {grade_items} gi ON gi.courseid = c.id JOIN {grade_grades} gg ON gg.itemid = gi.id WHERE gi.itemtype = 'course' AND gg.finalgrade IS NOT NULL GROUP BY c.id, c.fullname
+    • LIMIT CONSTRAINTS: Extract low-scoring profiles cleanly via $DB->get_records_sql($sql, null, 0, 5);
+    • DATA INTEGRITY: Enforce Unique Constraints (UNI) on course indices to protect multi-table computations.
+
+    Voiceover Script:
+    True learning analytics require robust multi-table execution patterns. By joining system course tracking maps cleanly against internal calculation grades, we compile targeted, performant profiles that power the low-performance reporting charts inside the plugin system.]
+    ]]></text></questiontext>
+  </question>
+
+  <question type="description">
+    <name><text>06. Lesson 1.6: The DML API - Core Validation Bypass Mechanisms</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: Low-Level DML System Fallbacks]
+
+    [NARRATIVE: Slide Bullet Points:
+    • OVERRIDE UTILITY: Work around high-level framework abstraction rules and active transactional cache blocks.
+    • DIRECT SYSTEM COMMAND: $inserted_id = $DB->insert_record('competency_framework', $framework_object);
+    • OPERATIONAL SAFEGUARD: Prevents memory overflow errors during extensive data initializations.
+    • FUTURE SCALING TANGENT: Forms the structural ingestion pathway for automated competency modeling pipelines.
+
+    Voiceover Script:
+    High-level persistent object APIs are the standard operational rule, but enterprise-scale automated systems demand robust fallback logic. By using raw insertion operations when cache limits or transaction validation sequences lock up, we establish resilient configuration points that secure long-term platform capability.]
+    ]]></text></questiontext>
+  </question>
+
+</quiz>

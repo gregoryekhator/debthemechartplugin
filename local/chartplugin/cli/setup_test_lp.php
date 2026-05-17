@@ -1,4 +1,16 @@
 <?php
+/**
+ * setup_test_lp.php
+ *
+ * @package    local_chartplugin
+ * @copyright  2026 Debonair Training
+ * @author     Gregory Ekhator <greg_ekhator@yahoo.com>
+ * @company    Debonair Training Limited
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
 define('CLI_SCRIPT', true);
 require_once(__DIR__ . '/../../../config.php'); // Note the extra ../ for cli folder
 

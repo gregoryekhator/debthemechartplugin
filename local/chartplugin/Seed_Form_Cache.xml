@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="description">
+    <name><text>07. Lesson 2.1: Form API - Dynamic Server-Side Validation</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: Form API Validation Architectures]
+
+    [NARRATIVE: Slide Bullet Points:
+    • DEFINITION: Secure server-side validation framework handling input sanitation and business rule constraint logic.
+    • OOP INITIALIZATION: Inherits directly from the moodleform core class override rules.
+    • COMMON USAGE: Enforces custom relational dependencies between input fields before processing database insertion.
+    • DEMO PROBLEM: A plugin form accepts date ranges but fails to catch scenarios where start dates occur in the past.
+    • CODE SOLUTION: Override the base validation method to intercept input arrays and map custom error message strings back to target keys using the get_string helper.
+    • CORE VALIDATION, ASSIGNMENT & REFERENCES: Implement an additional constraint validating that enddate occurs at least 24 hours after startdate. Reference: Form API documentation inside lib/formslib.php.
+
+    Voiceover Script:
+    Welcome to Moodle Form API architectures. Server-side validation is your application's primary defense layer. By overriding the native validation method within your custom form class, you intercept incoming data payloads, evaluate business logic constraints natively, and safely map error alerts straight back to user viewports without risking database corruption.]
+    ]]></text></questiontext>
+  </question>
+
+  <question type="description">
+    <name><text>08. Lesson 2.2: Form API - Asynchronous Repeater Element Engineering</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: Dynamic Form Repeat Elements]
+
+    [NARRATIVE: Slide Bullet Points:
+    • DEFINITION: Flexible interface arrays allowing users to dynamically expand input sets via JavaScript layouts.
+    • OOP INITIALIZATION: Utilizes the HTML_QuickForm_renderer object engine compilation layers.
+    • COMMON USAGE: Structuring bulk data entry models like dynamic option lists or quiz multi-choice variations.
+    • DEMO PROBLEM: Standard forms limit input rows, forcing users to repeatedly save and reload layout interfaces.
+    • CODE SOLUTION: Formulate a custom element group map array, define element type criteria parameters, and invoke the repeat_elements method to scale input rows dynamically.
+    • CORE VALIDATION, ASSIGNMENT & REFERENCES: Build a dynamic field map that initializes with 4 empty rows by default and enforces a strict ceiling of 10 rows. Reference: Moodle Developer Docs: Form API Repeaters.
+
+    Voiceover Script:
+    User experience at scale demands clean, dynamic element handling. Using Moodle's built-in structural repeater elements within your form definition layer allows your application to handle multi-row variable inputs gracefully, processing all serialized array indices automatically during data extraction transitions.]
+    ]]></text></questiontext>
+  </question>
+
+  <question type="description">
+    <name><text>09. Lesson 2.3: Events API - Custom Observers &amp; Transaction Interception</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: Events API Observer Routing]
+
+    [NARRATIVE: Slide Bullet Points:
+    • DEFINITION: An event-driven architecture designed to trigger internal application actions when core state mutations take place.
+    • OOP INITIALIZATION: Extends the framework base class namespace core event base layout engine infrastructure.
+    • COMMON USAGE: Storing complex audit logs, external webhook notifications, or real-time metric tracking updates.
+    • DEMO PROBLEM: Custom plugin analytics fail to track exactly when a user downloads an internal course asset assignment.
+    • CODE SOLUTION: Register a multi-dimensional array map inside the plugin database events configuration file linking target event names directly to custom handling class method callbacks.
+    • CORE VALIDATION, ASSIGNMENT & REFERENCES: Register a brand-new custom event observer that captures user logouts and routes payload hashes to an external tracking log table. Reference: Events API Hook Documentation.
+
+    Voiceover Script:
+    Event-driven automation keeps your custom plugins synchronized with core system states. By configuring strict callback configurations inside your database event map file, you establish precise operational listening posts that catch user behavior hooks instantly without mutating core codebase architectures.]
+    ]]></text></questiontext>
+  </question>
+
+  <question type="description">
+    <name><text>10. Lesson 2.4: Moodle Universal Cache (MUC) - Redis Storage Operations</text></name>
+    <questiontext format="html"><text><![CDATA[
+    [SLIDE: MUC Memory Cache Tiering]
+
+    [NARRATIVE: Slide Bullet Points:
+    • DEFINITION: High-performance data tiering infrastructure designed to offload direct SQL compute strains.
+    • OOP INITIALIZATION: Handled via the core cache_factory make_instance layout manager tracking tools.
+    • COMMON USAGE: Storing heavy aggregated reporting tables or complex analytics arrays in high-speed RAM storage.
+    • DEMO PROBLEM: Multi-table analytical reporting queries compute live on every single dashboard view, causing heavy latency spikes.
+    • CODE SOLUTION: Instantiate your target cache definition instance, perform a boolean status check on the key payload, and compute and store data only when a cache cache miss is confirmed.
+    • CORE VALIDATION, ASSIGNMENT & REFERENCES: Configure a time-to-live parameter of 1800 seconds on your cache map definition layer to force clean automated refresh windows. Reference: Cache API (MUC) Optimization.
+
+    Voiceover Script:
+    Enterprise scale is completely unachievable without efficient caching strategies. Moodle’s Universal Cache provides an abstraction layer that sits directly over memory storage instances like Redis. By implementing rigorous 'get-or-compute' retrieval logic, your custom application code serves complex analytics profiles in milliseconds, protecting database servers from repetitive operational loads.]
+    ]]></text></questiontext>
+  </question>
+
+</quiz>

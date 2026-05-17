@@ -1,5 +1,17 @@
 <?php
 /**
+ * lib.php
+ *
+ * @package    local_chartplugin
+ * @copyright  2026 Debonair Training
+ * @author     Gregory Ekhator <greg_ekhator@yahoo.com>
+ * @company    Debonair Training Limited
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
  * Path: /var/www/html/moodle_test/local/chartplugin/lib.php
  * Library for Debonair Learning Analytics Dashboard (Phase 4 Production Build)
  */
@@ -114,27 +126,21 @@ function local_chartplugin_save_history($data) {
 }
 
 /**
- * 4. CORE ACCESS CHECK (Day 9 Polish)
+ * 4. CORE ACCESS CHECK
  */
 function local_chartplugin_get_access_status() {
     global $USER, $DB;
 
-    // 1. Fetch the DB record first to see if we have manual overrides or credits
-    $records = $DB->get_records('local_chartplugin_payments', ['userid' => $USER->id], 'id DESC', '*', 0, 1);
-    $record = reset($records);
-
-    // 2. Priority: If a manual "valid_until" exists and is in the future, it's Enterprise
-    if ($record && !empty($record->valid_until) && $record->valid_until > time()) {
+    if (is_siteadmin()) {
         return 'enterprise';
     }
 
-    // 3. Trial Period Check
-    // ADMIN FIX: We ignore the trial for Admins so you can test the "Boost" button logic
-    if (!is_siteadmin()) {
-        $trial_duration = 7 * 24 * 60 * 60;
-        if (isset($USER->timecreated) && ($USER->timecreated + $trial_duration) > time()) {
-            return 'enterprise';
-        }
+    // Check the table that actually stores the current balance
+    $record = $DB->get_record('local_chartplugin_users', ['userid' => $USER->id]);
+    
+    // If they have any credits, they are Enterprise
+    if ($record && $record->credits > 0) {
+        return 'enterprise';
     }
 
     return 'freemium';

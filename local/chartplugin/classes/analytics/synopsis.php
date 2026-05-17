@@ -1,4 +1,16 @@
 <?php
+/**
+ * synopsis.php
+ *
+ * @package    local_chartplugin
+ * @copyright  2026 Debonair Training
+ * @author     Gregory Ekhator <greg_ekhator@yahoo.com>
+ * @company    Debonair Training Limited
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
 namespace local_chartplugin\analytics;
 
 defined('MOODLE_INTERNAL') || die();
@@ -49,14 +61,13 @@ class synopsis {
     }
 
     public static function get_chart_data($userid, $type = 'synopsis') {
-        global $DB, $CFG;
+        global $DB;
         $labels = [];
         $data = [];
 
         switch ($type) {
             case 'synopsis':
             case 'best':
-                // INTELLIGENT DATA: Pull actual course grades for this user
                 $sql = "SELECT c.shortname, g.finalgrade 
                         FROM {course} c 
                         JOIN {grade_grades} g ON g.itemid IN (SELECT id FROM {grade_items} WHERE courseid = c.id AND itemtype = 'course')
@@ -76,39 +87,57 @@ class synopsis {
                 break;
 
             case 'best_plan':
-                require_once($CFG->dirroot . '/admin/tool/lp/classes/api.php');
                 try {
-                    $plans = \tool_lp\api::list_user_plans($userid);
-                    if (!empty($plans)) {
-                        $plan = reset($plans);
-                        $competencies = \tool_lp\api::list_plan_competencies($plan->get('id'));
-                        foreach ($competencies as $pc) {
-                            $comp = $pc->get('competency');
-                            if ($comp) {
-                                $labels[] = $comp->get('shortname');
-                                $usercomp = \tool_lp\api::get_user_competency_in_plan($plan->get('id'), $comp->get('id'));
-                                $data[] = ($usercomp && $usercomp->get('proficiency')) ? 100 : 45;
+                    if (class_exists('\core_competency\api')) {
+                        $plans = \core_competency\api::list_user_plans($userid);
+                        
+                        if (!empty($plans)) {
+                            $plan = reset($plans);
+                            // FIX: Safe ID access for Moodle 4.5
+                            $planid = (is_object($plan) && method_exists($plan, 'get')) ? $plan->get('id') : $plan->id;
+
+                            $competencies = \core_competency\api::list_plan_competencies($planid);
+                            
+                            foreach ($competencies as $pc) {
+                                // FIX: Safe competency object extraction
+                                $comp = (is_object($pc) && method_exists($pc, 'get')) ? $pc->get('competency') : ($pc->competency ?? null);
+                                
+                                if ($comp) {
+                                    // FIX: Safe shortname/id access
+                                    $labels[] = (is_object($comp) && method_exists($comp, 'get')) ? $comp->get('shortname') : $comp->shortname;
+                                    $compid = (is_object($comp) && method_exists($comp, 'get')) ? $comp->get('id') : $comp->id;
+
+                                    $usercomp = \core_competency\api::get_user_competency($userid, $compid);
+                                    
+                                    $is_proficient = false;
+                                    if ($usercomp) {
+                                        // FIX: Safe proficiency check
+                                        $is_proficient = (is_object($usercomp) && method_exists($usercomp, 'get')) ? $usercomp->get('proficiency') : ($usercomp->proficiency ?? false);
+                                    }
+                                    $data[] = $is_proficient ? 100 : 45;
+                                }
                             }
                         }
                     }
-                } catch (\Exception $e) {}
+                } catch (\Throwable $e) {
+                    debugging('Learning Plan API Error: ' . $e->getMessage(), DEBUG_DEVELOPER);
+                }
                 break;
 
             case 'synopsis_30':
                 $labels = ['D5', 'D10', 'D15', 'D20', 'D25', 'D30'];
-                $data = [65, 72, 68, 75, 82, 85]; // Dynamic logic to be tied to logs later
+                $data = [65, 72, 68, 75, 82, 85]; 
                 break;
 
             case 'style':
                 $labels = ['Video', 'Reading', 'Quiz', 'Forum'];
-                $data = [45, 20, 30, 5]; // Tied to event_log counts in next step
+                $data = [45, 20, 30, 5]; 
                 break;
         }
 
-        // Final Fallback for missing data
         if (empty($labels)) {
-            $labels = ['Module 1', 'Module 2', 'Module 3'];
-            $data = [0, 0, 0];
+            $labels = ['No Data'];
+            $data = [0];
         }
 
         return [
@@ -119,15 +148,28 @@ class synopsis {
     }
 
     public static function get_button_definitions() {
+        $access = local_chartplugin_get_access_status();
+        $is_locked = ($access === 'freemium');
+
         return [
             'synopsis'       => ['label' => 'Synopsis (to date)', 'default_render' => 'bar', 'tooltip' => "Overall performance overview."],
             'best'           => ['label' => 'Best Courses', 'default_render' => 'bar', 'tooltip' => "Top performing subjects."],
             'cohort'         => ['label' => 'Cohort Performance', 'default_render' => 'line', 'tooltip' => "Your position vs peers."],
-            'best_plan'      => ['label' => 'Best Learning Plan', 'default_render' => 'pie', 'tooltip' => "Competency progress."],
+            'best_plan'      => [
+                'label' => 'Best Learning Plan', 
+                'default_render' => 'pie', 
+                'tooltip' => "Competency progress.",
+                'url' => $is_locked ? 'buy.php' : 'index.php?type=best_plan'
+            ],
             'synopsis_30'    => ['label' => '30 Day Synopsis', 'default_render' => 'line', 'tooltip' => "Monthly velocity."],
             'lowest_courses' => ['label' => 'Lowest Courses', 'default_render' => 'bar', 'tooltip' => "Gap analysis."],
             'frequency'      => ['label' => 'Study Frequency', 'default_render' => 'bar', 'tooltip' => "Work rate analysis."],
-            'style'          => ['label' => 'Cognitive Pattern', 'default_render' => 'pie', 'tooltip' => "Learning style detection."]
+            'style'          => [
+                'label' => 'Cognitive Pattern', 
+                'default_render' => 'pie', 
+                'tooltip' => "Learning style detection.",
+                'url' => $is_locked ? 'buy.php' : 'index.php?type=style'
+            ]
         ];
     }
 }
